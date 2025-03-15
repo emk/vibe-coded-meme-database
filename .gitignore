@@ -2,6 +2,9 @@
 /test-memes/
 /memedb/
 
+# Documentation.
+/OLLAMA_API_DOCS.md
+
 # Dependencies
 node_modules/
 npm-debug.log

@@ -1,6 +1,12 @@
-# Meme Database
+# Meme Database (a "vibe-coding" experiment)
+
+> **WARNING: This is an experiment with AI-written code.** Much of this code has never been looked at by a human.
 
 A single-user database for storing, indexing and searching meme images. All meme categorization is handled automatically using a visual LLM through Ollama.
+
+The original working version of this program was written by [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview), with no human-written parts. Some help was provided by a human, including the spec, some general advice, and debugging help. See [CLAUDE.md](./CLAUDE.md) for Claude's notes.
+
+![Meme database with text search bar and meme thumbnails](screenshots/meme-database.webp)
 
 ## Features
 
