@@ -3,12 +3,20 @@
     "description": "Information about a meme.",
     "properties": {
         "category": {
-            "description": "Meme category (\"politics\", \"reaction\", etc).",
+            "description": "Meme category.",
+            "examples": [
+                "reaction",
+                "politics"
+            ],
             "pattern": "^[a-z0-9_]{1,20}$",
             "type": "string"
         },
         "descriptive_image_filename": {
-            "description": "A descriptive filename based on the content. (Does not include\nan extension.)",
+            "description": "A descriptive filename based on the short description. (Does not include\nan extension.)",
+            "examples": [
+                "gru_characters_feelings",
+                "horse_stalling"
+            ],
             "pattern": "^[a-z0-9_]{1,40}$",
             "type": "string"
         },

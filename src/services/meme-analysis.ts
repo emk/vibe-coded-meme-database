@@ -9,18 +9,20 @@ export default interface MemeAnalysis {
     /** A short description of the image (up to 100 words). */
     short_description: string;
     /**
-     * Meme category ("politics", "reaction", etc).
+     * Meme category.
      *
      * @pattern ^[a-z0-9_]{1,20}$
+     * @examples ["reaction", "politics"]
      */
     category: string;
     /** Search keywords for this meme (up to 5). */
     keywords: string[];
     /**
-     * A descriptive filename based on the content. (Does not include
-     * an extension.)
+     * A descriptive filename based on the short description. (Does not
+     * include an extension.)
      * 
      * @pattern ^[a-z0-9_]{1,40}$
+     * @examples ["gru_characters_feelings", "horse_stalling"]
      */
     descriptive_image_filename: string;
 }
