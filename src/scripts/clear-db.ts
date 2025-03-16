@@ -22,6 +22,7 @@ async function clearDatabase(): Promise<void> {
   
   // Create a new empty database with the schema
   const db = new DatabaseService(dbPath);
+  await db.init(); // This will create the tables via migrations
   console.log('New empty database created');
   
   // Optionally clear the meme directory
@@ -42,7 +43,7 @@ async function clearDatabase(): Promise<void> {
   }
   
   // Close the database connection
-  db.close();
+  await db.close();
   
   console.log('Database reset complete');
 }

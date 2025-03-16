@@ -26,30 +26,40 @@ type MemeIdParams = { id: string };
 type CategoryFilenameParams = { category: string; filename: string };
 
 // API Routes
-app.get('/api/memes', (req, res) => {
-  const query = req.query.q as string;
-  const limit = 200; // Hard-coded limit to 200 memes
-  let memes;
-  
-  if (query && query.trim()) {
-    memes = db.searchMemes(query, limit);
-  } else {
-    memes = db.getAllMemes(limit);
+app.get('/api/memes', async (req, res) => {
+  try {
+    const query = req.query.q as string;
+    const limit = 200; // Hard-coded limit to 200 memes
+    let memes;
+    
+    if (query && query.trim()) {
+      memes = await db.searchMemes(query, limit);
+    } else {
+      memes = await db.getAllMemes(limit);
+    }
+    
+    res.json(memes);
+  } catch (error) {
+    console.error('Error fetching memes:', error);
+    res.status(500).json({ error: 'Failed to fetch memes' });
   }
-  
-  res.json(memes);
 });
 
-app.get<MemeIdParams>('/api/memes/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const meme = db.getMemeById(id);
-  
-  if (!meme) {
-    res.status(404).json({ error: 'Meme not found' });
-    return;
+app.get<MemeIdParams>('/api/memes/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const meme = await db.getMemeById(id);
+    
+    if (!meme) {
+      res.status(404).json({ error: 'Meme not found' });
+      return;
+    }
+    
+    res.json(meme);
+  } catch (error) {
+    console.error('Error fetching meme by ID:', error);
+    res.status(500).json({ error: 'Failed to fetch meme' });
   }
-  
-  res.json(meme);
 });
 
 // Serve the meme image files
@@ -335,12 +345,23 @@ document.addEventListener('DOMContentLoaded', () => {
   fs.writeFileSync(jsPath, js);
 }
 
-// The getMemeById method has been added to the DatabaseService class
+// Start the server with async initialization
+async function startServer() {
+  try {
+    // Initialize the database and run migrations
+    await db.init();
+    
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+      console.log('Use the following commands:');
+      console.log(`- To import memes: npm run import <path-to-image-folder>`);
+      console.log(`- Web UI available at: http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to initialize database:', error);
+    process.exit(1);
+  }
+}
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log('Use the following commands:');
-  console.log(`- To import memes: npm run import <path-to-image-folder>`);
-  console.log(`- Web UI available at: http://localhost:${PORT}`);
-});
+startServer();

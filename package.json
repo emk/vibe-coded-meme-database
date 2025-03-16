@@ -11,7 +11,9 @@
     "import": "ts-node src/scripts/import.ts",
     "analyze": "ts-node src/scripts/analyze.ts",
     "clear-db": "ts-node src/scripts/clear-db.ts",
-    "update-schema": "typescript-json-schema --required src/services/meme-analysis.ts MemeAnalysis -o src/services/meme-analysis.json", 
+    "update-schema": "typescript-json-schema --required src/services/meme-analysis.ts MemeAnalysis -o src/services/meme-analysis.json",
+    "migrate": "ts-node src/scripts/migrate.ts",
+    "register-migrations": "ts-node src/scripts/migrate.ts register-existing",
     "lint": "eslint . --ext .ts",
     "test": "jest"
   },
@@ -31,6 +33,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "kysely": "^0.27.6",
     "ollama": "^0.5.14",
     "sharp": "^0.33.5",
     "ts-node": "^10.9.2",

@@ -14,6 +14,12 @@ npm run import <path>
 # Serve web UI
 npm run serve
 
+# Run database migrations
+npm run migrate
+
+# Register existing database with migration system
+npm run register-migrations
+
 # Clear database (use with caution)
 npm run clear-db
 
@@ -49,7 +55,7 @@ memedb/
 
 ### Technology Stack
 - **Backend**: Node.js with Express.js, TypeScript
-- **Database**: SQLite via better-sqlite3
+- **Database**: SQLite via better-sqlite3 with Kysely for type-safe queries and migrations
 - **AI Integration**: Ollama API for image analysis
 - **Image Processing**: Sharp for thumbnail generation
 - **Frontend**: HTML/CSS/JavaScript

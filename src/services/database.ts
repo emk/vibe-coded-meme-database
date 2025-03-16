@@ -1,121 +1,131 @@
-import Database from 'better-sqlite3';
 import path from 'path';
-import fs from 'fs';
-import { Meme, MemeInput } from '../models/Meme';
+import { promises as fs } from 'fs';
+import { Kysely, SqliteDialect, sql } from 'kysely';
+import Database from 'better-sqlite3';
+import { 
+  Database as DbType, 
+  DatabaseMeme, 
+  Meme, 
+  MemeInput, 
+  NewDatabaseMeme 
+} from '../models/Meme';
+import { migrateToLatest } from './migrator';
 
 export class DatabaseService {
-  protected db: Database.Database;
+  protected db: Kysely<DbType>;
+  protected dbPath: string;
 
   constructor(dbPath: string) {
-    // Ensure directory exists
-    const dbDir = path.dirname(dbPath);
-    if (!fs.existsSync(dbDir)) {
-      fs.mkdirSync(dbDir, { recursive: true });
-    }
-
-    this.db = new Database(dbPath);
-    this.init();
+    this.dbPath = dbPath;
+    this.db = new Kysely<DbType>({
+      dialect: new SqliteDialect({
+        database: new Database(dbPath)
+      }),
+    });
   }
 
-  private init(): void {
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS memes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        path TEXT NOT NULL,
-        filename TEXT NOT NULL,
-        category TEXT NOT NULL,
-        hash TEXT NOT NULL UNIQUE,
-        text TEXT,
-        description TEXT,
-        keywords TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-      
-      CREATE INDEX IF NOT EXISTS idx_memes_hash ON memes(hash);
-      CREATE INDEX IF NOT EXISTS idx_memes_text ON memes(text);
-      CREATE INDEX IF NOT EXISTS idx_memes_description ON memes(description);
-      CREATE INDEX IF NOT EXISTS idx_memes_keywords ON memes(keywords);
-    `);
+  // Initialize database with migrations
+  public async init(): Promise<void> {
+    await migrateToLatest(this.dbPath);
   }
 
-  public addMeme(meme: MemeInput): number {
-    const stmt = this.db.prepare(`
-      INSERT INTO memes (path, filename, category, hash, text, description, keywords)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    const result = stmt.run(
-      meme.path,
-      meme.filename,
-      meme.category,
-      meme.hash,
-      meme.text,
-      meme.description,
-      JSON.stringify(meme.keywords)
-    );
-
-    return result.lastInsertRowid as number;
-  }
-
-  public getMemeByHash(hash: string): Meme | null {
-    const stmt = this.db.prepare('SELECT * FROM memes WHERE hash = ?');
-    const row = stmt.get(hash) as any;
+  // Add a new meme to the database
+  public async addMeme(meme: MemeInput): Promise<number> {
+    // Prepare data for database insertion
+    const newMeme: NewDatabaseMeme = {
+      path: meme.path,
+      filename: meme.filename,
+      category: meme.category,
+      hash: meme.hash,
+      text: meme.text || null,
+      description: meme.description || null,
+      keywords: JSON.stringify(meme.keywords)
+    };
     
+    // Insert the meme and return the ID
+    const result = await this.db
+      .insertInto('memes')
+      .values(newMeme)
+      .returning('id')
+      .executeTakeFirstOrThrow();
+      
+    return Number(result.id);
+  }
+
+  // Get meme by hash
+  public async getMemeByHash(hash: string): Promise<Meme | null> {
+    const row = await this.db
+      .selectFrom('memes')
+      .selectAll()
+      .where('hash', '=', hash)
+      .executeTakeFirst();
+      
     if (!row) return null;
     
-    return {
-      ...row,
-      keywords: JSON.parse(row.keywords || '[]'),
-      created_at: new Date(row.created_at),
-      description: row.description || '' 
-    };
+    return this.mapRowToMeme(row);
   }
 
-  public searchMemes(query: string, limit: number = 200): Meme[] {
-    const stmt = this.db.prepare(`
-      SELECT * FROM memes 
-      WHERE text LIKE ? OR description LIKE ? OR keywords LIKE ? OR filename LIKE ?
-      ORDER BY created_at DESC
-      LIMIT ?
-    `);
-    
+  // Search memes
+  public async searchMemes(query: string, limit: number = 200): Promise<Meme[]> {
     const searchPattern = `%${query}%`;
-    const rows = stmt.all(searchPattern, searchPattern, searchPattern, searchPattern, limit) as any[];
+    const rows = await this.db
+      .selectFrom('memes')
+      .selectAll()
+      .where(eb => eb.or([
+        eb('text', 'like', searchPattern),
+        eb('description', 'like', searchPattern),
+        eb('keywords', 'like', searchPattern),
+        eb('filename', 'like', searchPattern)
+      ]))
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .execute();
+      
+    return rows.map(row => this.mapRowToMeme(row));
+  }
+
+  // Get all memes
+  public async getAllMemes(limit: number = 200): Promise<Meme[]> {
+    const rows = await this.db
+      .selectFrom('memes')
+      .selectAll()
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .execute();
+      
+    return rows.map(row => this.mapRowToMeme(row));
+  }
+
+  // Get meme by ID
+  public async getMemeById(id: number): Promise<Meme | null> {
+    const row = await this.db
+      .selectFrom('memes')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+      
+    if (!row) return null;
     
-    return rows.map(row => ({
-      ...row,
+    return this.mapRowToMeme(row);
+  }
+
+  // Close database connection
+  public async close(): Promise<void> {
+    await this.db.destroy();
+  }
+
+  // Helper method to map a database row to a client-facing Meme object
+  private mapRowToMeme(row: DatabaseMeme): Meme {
+    return {
+      id: Number(row.id),
+      path: row.path,
+      filename: row.filename,
+      category: row.category,
+      hash: row.hash,
+      text: row.text || '',
+      description: row.description || '',
       keywords: JSON.parse(row.keywords || '[]'),
       created_at: new Date(row.created_at)
-    }));
-  }
-
-  public getAllMemes(limit: number = 200): Meme[] {
-    const stmt = this.db.prepare('SELECT * FROM memes ORDER BY created_at DESC LIMIT ?');
-    const rows = stmt.all(limit) as any[];
-    
-    return rows.map(row => ({
-      ...row,
-      keywords: JSON.parse(row.keywords || '[]'),
-      created_at: new Date(row.created_at),
-      description: row.description || ''
-    }));
-  }
-
-  public getMemeById(id: number): Meme | null {
-    const stmt = this.db.prepare('SELECT * FROM memes WHERE id = ?');
-    const row = stmt.get(id) as any;
-    
-    if (!row) return null;
-    
-    return {
-      ...row,
-      keywords: JSON.parse(row.keywords || '[]'),
-      created_at: new Date(row.created_at),
-      description: row.description || ''
     };
-  }
-
-  public close(): void {
-    this.db.close();
   }
 }

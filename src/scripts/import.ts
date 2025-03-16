@@ -40,6 +40,9 @@ async function importMemes(sourcePath: string): Promise<void> {
   ensureDirectoryExists(memeDir);
   
   const db = new DatabaseService(dbPath);
+  // Initialize the database with migrations
+  await db.init();
+  
   const ai = new AIService(ollamaHost, aiModel);
 
   // Check if the source is a file or directory
@@ -102,7 +105,7 @@ async function importMemes(sourcePath: string): Promise<void> {
       const hash = generateFileHash(sourcePath);
       
       // Check if we already have this meme
-      const existingMeme = db.getMemeByHash(hash);
+      const existingMeme = await db.getMemeByHash(hash);
       if (existingMeme) {
         console.log(`Skipping ${fileName} (already exists)`);
         skipped++;
@@ -141,7 +144,7 @@ async function importMemes(sourcePath: string): Promise<void> {
       fs.copyFileSync(sourcePath, destPath);
       
       // Add to database
-      db.addMeme({
+      await db.addMeme({
         path: destPath,
         filename: uniqueFilename,
         category,
@@ -165,7 +168,7 @@ async function importMemes(sourcePath: string): Promise<void> {
   console.log(`Failed: ${imageFiles.length - imported - skipped}`);
 
   // Close the database connection
-  db.close();
+  await db.close();
 }
 
 // Get the source directory from command line arguments
