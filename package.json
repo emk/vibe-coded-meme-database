@@ -9,6 +9,7 @@
     "start": "node dist/index.js",
     "serve": "ts-node src/index.ts",
     "import": "ts-node src/scripts/import.ts",
+    "analyze": "ts-node src/scripts/analyze.ts",
     "clear-db": "ts-node src/scripts/clear-db.ts",
     "lint": "eslint . --ext .ts",
     "test": "jest"

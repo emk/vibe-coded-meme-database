@@ -22,7 +22,7 @@ export class AIService {
     this.model = model;
   }
 
-  public async analyzeMeme(imagePath: string): Promise<MemeAnalysis> {
+  public async analyzeMeme(imagePath: string, numCtx: number = 4096): Promise<MemeAnalysis> {
     const imageBase64 = fs.readFileSync(imagePath).toString('base64');
 
     const prompt = `
@@ -63,25 +63,21 @@ export class AIService {
         ],
         format: 'json',
         options: {
-          num_ctx: 8192
+          num_ctx: numCtx
         }
       });
       
       // Log the AI response for debugging
       console.log('AI Response content:', response.message.content);
       
+      // Parse the response
       const result = this.parseResponse(response.message.content);
       console.log('Parsed result:', JSON.stringify(result, null, 2));
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error analyzing meme with AI:', error);
-      return {
-        text: '',
-        description: 'Failed to analyze this image',
-        category: 'unknown',
-        keywords: ['error', 'unknown'],
-        generated_filename: 'unknown_error_image'
-      };
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to analyze meme: ${errorMessage}`);
     }
   }
 
@@ -90,26 +86,43 @@ export class AIService {
       // Try to parse as JSON directly
       const result = JSON.parse(content) as MemeAnalysis;
       
-      // Ensure result has all required fields
+      // Validate that the response contains the required fields
+      if (!result) {
+        throw new Error('Empty response from AI service');
+      }
+      
+      // Check for required fields
+      if (!result.description) {
+        throw new Error('AI response missing required field: description');
+      }
+      
+      if (!result.category) {
+        throw new Error('AI response missing required field: category');
+      }
+      
+      if (!Array.isArray(result.keywords) || result.keywords.length === 0) {
+        throw new Error('AI response missing required field: keywords');
+      }
+      
+      if (!result.generated_filename) {
+        throw new Error('AI response missing required field: generated_filename');
+      }
+      
+      // Ensure result has all fields (text can be empty if truly no text in image)
       return {
         text: result.text || '',
-        description: result.description || 'No description available',
-        category: result.category || 'unknown',
-        keywords: Array.isArray(result.keywords) ? result.keywords : [],
-        generated_filename: result.generated_filename || 'unnamed_meme'
+        description: result.description,
+        category: result.category,
+        keywords: result.keywords,
+        generated_filename: result.generated_filename
       };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to parse AI response:', error);
       console.log('Raw response:', content);
       
-      // Return default values if parsing fails
-      return {
-        text: '',
-        description: 'Failed to parse AI response',
-        category: 'unknown',
-        keywords: ['error', 'parsing_failed'],
-        generated_filename: 'parsing_error'
-      };
+      // Throw the error instead of returning default values
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to parse AI response: ${errorMessage}`);
     }
   }
 }
