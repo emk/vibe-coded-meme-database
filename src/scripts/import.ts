@@ -15,6 +15,9 @@ dotenv.config();
 // Supported image extensions
 const SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif'];
 
+// Maximum file size (2MB in bytes)
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
+
 async function importMemes(sourcePath: string): Promise<void> {
   // Validate arguments
   if (!sourcePath) {
@@ -87,6 +90,14 @@ async function importMemes(sourcePath: string): Promise<void> {
     const ext = path.extname(fileName).toLowerCase();
     
     try {
+      // Check file size
+      const fileStats = fs.statSync(sourcePath);
+      if (fileStats.size > MAX_FILE_SIZE) {
+        console.log(`Skipping ${fileName} (file size ${(fileStats.size / 1024 / 1024).toFixed(2)} MB exceeds limit of 2 MB)`);
+        skipped++;
+        continue;
+      }
+      
       // Generate a hash for the file to avoid duplicates
       const hash = generateFileHash(sourcePath);
       
@@ -150,7 +161,7 @@ async function importMemes(sourcePath: string): Promise<void> {
   console.log('\nImport summary:');
   console.log(`Total files: ${imageFiles.length}`);
   console.log(`Imported: ${imported}`);
-  console.log(`Skipped (duplicates): ${skipped}`);
+  console.log(`Skipped (duplicates/oversized): ${skipped}`);
   console.log(`Failed: ${imageFiles.length - imported - skipped}`);
 
   // Close the database connection
