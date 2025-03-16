@@ -37,6 +37,9 @@ export class AIService {
         ],
         format: MemeAnalysisSchema,
         options: {
+          // Gemma3 27b sometimes generates infinite newlines when
+          // doing OCR. This will cause those outputs to fail quickly.
+          num_predict: 1024,
           num_ctx: numCtx
         }
       });
