@@ -52,10 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const fileExt = meme.path.substring(meme.path.lastIndexOf('.'));
       const imagePath = `/images/${meme.category}/${meme.filename}${fileExt}`;
       
+      const altText = meme.text ? 
+        (meme.description ? `${meme.text} - ${meme.description}` : meme.text) : 
+        (meme.description || 'Meme');
+      
       card.innerHTML = `
-        <img src="${imagePath}" alt="${meme.text || 'Meme'}">
+        <img src="${imagePath}" alt="${altText}" title="${altText}">
         <div class="meme-info">
-          <div class="meme-text">${meme.text || ''}</div>
           <div class="meme-keywords">
             ${meme.keywords.map(keyword => `<span class="keyword">${keyword}</span>`).join('')}
           </div>

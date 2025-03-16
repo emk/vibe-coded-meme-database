@@ -67,12 +67,7 @@ h1 {
   padding: 10px;
 }
 
-.meme-text {
-  font-size: 14px;
-  margin-bottom: 5px;
-  height: 40px;
-  overflow: hidden;
-}
+/* .meme-text has been removed - text is now in alt/title attributes */
 
 .meme-keywords {
   display: flex;
