@@ -1,17 +1,11 @@
 import { Ollama } from 'ollama';
 import fs from 'fs';
-import path from 'path';
+
+import MemeAnalysis from './meme-analysis';
+import MemeAnalysisSchema from './meme-analysis.json';
 
 // Default AI model to use for all image analysis
 export const DEFAULT_AI_MODEL = 'gemma3:27b';
-
-interface MemeAnalysis {
-  text: string;
-  description: string;
-  category: string;
-  keywords: string[];
-  generated_filename: string;
-}
 
 export class AIService {
   private ollama: Ollama;
@@ -26,27 +20,7 @@ export class AIService {
     const imageBase64 = fs.readFileSync(imagePath).toString('base64');
 
     const prompt = `
-    Analyze this image as a meme. I need you to provide the following information:
-    
-    1. Extract ALL visible text from the image (even small or hard to read text)
-    2. Write a brief description of what's shown in the image and what makes it funny or interesting
-    3. Categorize the meme (e.g., politics, animals, reaction, movie, etc.)
-    4. Provide relevant keywords that describe the content, theme, or emotions
-    5. Generate a descriptive, memorable filename that captures the essence of the meme
-    
-    Respond with a JSON object with the following structure:
-    {
-      "text": "ALL text visible in the meme - leave empty only if truly no text exists",
-      "description": "A brief description of what's happening in the image",
-      "category": "one_word_category",
-      "keywords": ["keyword1", "keyword2", "keyword3", "keyword4"],
-      "generated_filename": "descriptive_memorable_filename"
-    }
-    
-    For the category, use a simple descriptive word like "politics", "animals", "reaction", "movie", etc.
-    For the generated_filename, use ONLY alphanumeric characters and underscores (no spaces), keep it under 40 characters, and make it descriptive of the meme's content.
-    
-    IMPORTANT: Always provide a description even if there's no text in the image.
+    Extract the specified information from the image.
     `;
     
     try {
@@ -61,7 +35,7 @@ export class AIService {
             images: [imageBase64]
           }
         ],
-        format: 'json',
+        format: MemeAnalysisSchema,
         options: {
           num_ctx: numCtx
         }
@@ -92,8 +66,8 @@ export class AIService {
       }
       
       // Check for required fields
-      if (!result.description) {
-        throw new Error('AI response missing required field: description');
+      if (!result.short_description) {
+        throw new Error('AI response missing required field: short_description');
       }
       
       if (!result.category) {
@@ -104,17 +78,17 @@ export class AIService {
         throw new Error('AI response missing required field: keywords');
       }
       
-      if (!result.generated_filename) {
+      if (!result.descriptive_image_filename) {
         throw new Error('AI response missing required field: generated_filename');
       }
       
       // Ensure result has all fields (text can be empty if truly no text in image)
       return {
-        text: result.text || '',
-        description: result.description,
+        full_ocr_text: result.full_ocr_text || '',
+        short_description: result.short_description,
         category: result.category,
         keywords: result.keywords,
-        generated_filename: result.generated_filename
+        descriptive_image_filename: result.descriptive_image_filename
       };
     } catch (error: unknown) {
       console.error('Failed to parse AI response:', error);

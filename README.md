@@ -8,6 +8,12 @@ The original working version of this program was written by [Claude Code](https:
 
 ![Meme database with text search bar and meme thumbnails](screenshots/meme-database.webp)
 
+## Human-written code
+
+Other human-written bits added to make this more useful:
+
+- Improved LLM prompt using "structured output" mode and JSON schema. This fixed OCR text extraction with gemma3:27b, which is still somewhat picky.
+
 ## Features
 
 - Import memes from a local directory

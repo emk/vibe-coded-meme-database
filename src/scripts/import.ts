@@ -106,7 +106,7 @@ async function importMemes(sourcePath: string): Promise<void> {
       const category = sanitizeFilename(analysis.category || 'unknown');
       
       // Use the AI-generated filename (sanitized) or fallback to the original filename
-      let baseFilename = sanitizeFilename(analysis.generated_filename || path.parse(fileName).name);
+      let baseFilename = sanitizeFilename(analysis.descriptive_image_filename || path.parse(fileName).name);
       
       // Create the category directory if it doesn't exist
       const categoryDir = path.join(memeDir, category);
@@ -135,8 +135,8 @@ async function importMemes(sourcePath: string): Promise<void> {
         filename: uniqueFilename,
         category,
         hash,
-        text: analysis.text,
-        description: analysis.description,
+        text: analysis.full_ocr_text,
+        description: analysis.short_description,
         keywords: analysis.keywords
       });
       
