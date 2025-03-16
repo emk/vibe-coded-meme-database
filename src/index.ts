@@ -28,12 +28,13 @@ type CategoryFilenameParams = { category: string; filename: string };
 // API Routes
 app.get('/api/memes', (req, res) => {
   const query = req.query.q as string;
+  const limit = 200; // Hard-coded limit to 200 memes
   let memes;
   
   if (query && query.trim()) {
-    memes = db.searchMemes(query);
+    memes = db.searchMemes(query, limit);
   } else {
-    memes = db.getAllMemes();
+    memes = db.getAllMemes(limit);
   }
   
   res.json(memes);
@@ -259,17 +260,31 @@ document.addEventListener('DOMContentLoaded', () => {
       renderMemes(memes);
     } catch (error) {
       console.error('Error fetching memes:', error);
-      memeContainer.innerHTML = '<p>Error loading memes. Please try again.</p>';
+      memeContainer.innerHTML = '';
+      
+      const errorMessage = document.createElement('p');
+      errorMessage.textContent = 'Error loading memes. Please try again.';
+      memeContainer.appendChild(errorMessage);
     }
   }
   
   function renderMemes(memes) {
     if (memes.length === 0) {
-      memeContainer.innerHTML = '<p>No memes found. Try a different search.</p>';
+      memeContainer.innerHTML = '';
+      const noResults = document.createElement('p');
+      noResults.textContent = 'No memes found. Try a different search.';
+      memeContainer.appendChild(noResults);
       return;
     }
     
     memeContainer.innerHTML = '';
+    
+    if (memes.length === 200) {
+      const limitNotice = document.createElement('div');
+      limitNotice.className = 'limit-notice';
+      limitNotice.textContent = 'Showing the 200 most recent memes. Use search to narrow results.';
+      memeContainer.appendChild(limitNotice);
+    }
     
     memes.forEach(meme => {
       const card = document.createElement('div');
@@ -279,16 +294,37 @@ document.addEventListener('DOMContentLoaded', () => {
       const fileExt = meme.path.substring(meme.path.lastIndexOf('.'));
       const imagePath = \`/images/\${meme.category}/\${meme.filename}\${fileExt}\`;
       
-      card.innerHTML = \`
-        <img src="\${imagePath}" alt="\${meme.text || meme.description || 'Meme'}">
-        <div class="meme-info">
-          <div class="meme-text">\${meme.text || ''}</div>
-          <div class="meme-description">\${meme.description || ''}</div>
-          <div class="meme-keywords">
-            \${meme.keywords.map(keyword => \`<span class="keyword">\${keyword}</span>\`).join('')}
-          </div>
-        </div>
-      \`;
+      // Create image element with proper alt/title text
+      const img = document.createElement('img');
+      img.src = imagePath;
+      
+      const altText = meme.text ? 
+        (meme.description ? \`\${meme.text} - \${meme.description}\` : meme.text) : 
+        (meme.description || 'Meme');
+      
+      img.alt = altText;
+      img.title = altText;
+      
+      // Create meme info container
+      const memeInfo = document.createElement('div');
+      memeInfo.className = 'meme-info';
+      
+      // Create keywords container
+      const keywordsDiv = document.createElement('div');
+      keywordsDiv.className = 'meme-keywords';
+      
+      // Add keywords as spans
+      meme.keywords.forEach(keyword => {
+        const keywordSpan = document.createElement('span');
+        keywordSpan.className = 'keyword';
+        keywordSpan.textContent = keyword;
+        keywordsDiv.appendChild(keywordSpan);
+      });
+      
+      // Assemble the card
+      memeInfo.appendChild(keywordsDiv);
+      card.appendChild(img);
+      card.appendChild(memeInfo);
       
       memeContainer.appendChild(card);
     });

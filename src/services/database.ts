@@ -71,15 +71,16 @@ export class DatabaseService {
     };
   }
 
-  public searchMemes(query: string): Meme[] {
+  public searchMemes(query: string, limit: number = 200): Meme[] {
     const stmt = this.db.prepare(`
       SELECT * FROM memes 
       WHERE text LIKE ? OR description LIKE ? OR keywords LIKE ? OR filename LIKE ?
       ORDER BY created_at DESC
+      LIMIT ?
     `);
     
     const searchPattern = `%${query}%`;
-    const rows = stmt.all(searchPattern, searchPattern, searchPattern, searchPattern) as any[];
+    const rows = stmt.all(searchPattern, searchPattern, searchPattern, searchPattern, limit) as any[];
     
     return rows.map(row => ({
       ...row,
@@ -88,9 +89,9 @@ export class DatabaseService {
     }));
   }
 
-  public getAllMemes(): Meme[] {
-    const stmt = this.db.prepare('SELECT * FROM memes ORDER BY created_at DESC');
-    const rows = stmt.all() as any[];
+  public getAllMemes(limit: number = 200): Meme[] {
+    const stmt = this.db.prepare('SELECT * FROM memes ORDER BY created_at DESC LIMIT ?');
+    const rows = stmt.all(limit) as any[];
     
     return rows.map(row => ({
       ...row,
