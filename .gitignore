@@ -33,3 +33,4 @@ memedb/
 # OS files
 .DS_Store
 Thumbs.db
+KYSELY_DOCS.md
