@@ -17,9 +17,6 @@ npm run serve
 # Run database migrations
 npm run migrate
 
-# Register existing database with migration system
-npm run register-migrations
-
 # Clear database (use with caution)
 npm run clear-db
 

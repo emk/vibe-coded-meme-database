@@ -13,7 +13,6 @@
     "clear-db": "ts-node src/scripts/clear-db.ts",
     "update-schema": "typescript-json-schema --required src/services/meme-analysis.ts MemeAnalysis -o src/services/meme-analysis.json",
     "migrate": "ts-node src/scripts/migrate.ts",
-    "register-migrations": "ts-node src/scripts/migrate.ts register-existing",
     "lint": "eslint . --ext .ts",
     "test": "jest"
   },
