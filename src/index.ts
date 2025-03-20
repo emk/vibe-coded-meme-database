@@ -77,7 +77,7 @@ app.get<CategoryFilenameParams>('/images/:category/:filename', (req, res) => {
 });
 
 // Serve the main frontend
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 

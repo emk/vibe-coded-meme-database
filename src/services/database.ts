@@ -1,5 +1,4 @@
-import path from 'path';
-import { promises as fs } from 'fs';
+// Database service module
 import { Kysely, SqliteDialect, sql } from 'kysely';
 import Database from 'better-sqlite3';
 import { 
@@ -65,23 +64,30 @@ export class DatabaseService {
     return this.mapRowToMeme(row);
   }
 
-  // Search memes
+  // Search memes using FTS5 with ranking
   public async searchMemes(query: string, limit: number = 200): Promise<Meme[]> {
-    const searchPattern = `%${query}%`;
-    const rows = await this.db
-      .selectFrom('memes')
-      .selectAll()
-      .where(eb => eb.or([
-        eb('text', 'like', searchPattern),
-        eb('description', 'like', searchPattern),
-        eb('keywords', 'like', searchPattern),
-        eb('filename', 'like', searchPattern)
-      ]))
-      .orderBy('created_at', 'desc')
-      .limit(limit)
-      .execute();
-      
-    return rows.map(row => this.mapRowToMeme(row));
+    if (!query.trim()) {
+      return this.getAllMemes(limit);
+    }
+
+    // Format query for FTS5
+    const ftsQuery = query.trim();
+    
+    // Use FTS5 with ranking
+    const result = await sql<DatabaseMeme>`
+      SELECT m.*
+      FROM memes m
+      JOIN (
+        SELECT rowid, rank
+        FROM memes_fts
+        WHERE memes_fts MATCH ${ftsQuery}
+        ORDER BY rank
+      ) fts ON m.id = fts.rowid
+      ORDER BY fts.rank, m.created_at DESC
+      LIMIT ${limit}
+    `.execute(this.db);
+    
+    return result.rows.map(row => this.mapRowToMeme(row));
   }
 
   // Get all memes

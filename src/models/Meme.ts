@@ -3,6 +3,14 @@ import { Generated, Insertable, Selectable, Updateable } from 'kysely';
 // Database schema types for Kysely
 export interface Database {
   memes: MemeTable;
+  memes_fts: {
+    rowid: number;
+    text: string | null;
+    description: string | null; 
+    keywords: string | null;
+    filename: string;
+    rank: number;
+  };
   kysely_migration: {
     name: string;
     timestamp: string;

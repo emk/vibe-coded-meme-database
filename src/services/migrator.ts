@@ -12,7 +12,7 @@ export async function createMigrator(dbPath: string): Promise<{
   const dbDir = path.dirname(dbPath);
   try {
     await fs.mkdir(dbDir, { recursive: true });
-  } catch (error) {
+  } catch (_) {
     // Directory already exists
   }
 
