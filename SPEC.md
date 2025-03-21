@@ -25,7 +25,7 @@ The actual images are stored on disk in the `memes` folder with descriptive name
 All metadata should be derived automatically, by asking an AI model using ollama and responding with structured output. Available AI models include:
 
 - `gemma3:27b`: OK quality, medium speed.
-- `gemma3:4b`: Fast but less capable.
+- `gemma3:4b`: Fast, but too low quality to be useful.
 
 Note that you will need ollama 0.6.0 to use these models.
 
@@ -36,23 +36,45 @@ The project should have a command to import new memes from a specified folder. A
 To import the memes, the user should run:
 
 ```
-./import ~/path/to/meme/downloads/
+npm run import -- ~/path/to/meme/downloads/
 ```
-
-It's OK if the command is actually something like `npm run import ...` or `uv run import ...`.
 
 ## Viewing memes
 
 If the user runs:
 
 ```
-./serve
+npm run serve
 ```
 
 ...the app should open a web UI. This should have a search box on top, and image thumbnails of all matching memes below.
 
-Again, the actual command might be slightly different depending on the development tools chosen.
+## Meme Export
 
-## Tool choices
+When the user hovers over a meme, a checkbox should appear at the top left of the meme. The border of the checkbox should be translucent, and the center should be seethrough.
 
-Please pick one or more programming languages that you're familiar with, that support ollama, and that can be used to implement all features for the project. It's better to choose one language for everything if possible.
+```txt
++-
+|☐
+```
+
+If the user clicks on the checkbox, the checkbox should display a green indicator (which should remain visible even if the mouse moves away):
+
+```txt
++-
+|☑
+```
+
+It's OK to use icons for this. Let me know if you want me to download a specific icon set, or you can just use SVG. It would neat to use round checkboxes, if you can manage that.
+
+If any memes are checked, a non-scrolling footer should appear at the bottom of the page, displaying buttons:
+
+```txt
+[Unselect All] [Download N Memes]
+```
+
+...where N is the number of memes currently selected.
+
+Note that the set of selected memes should persist even if the search changes, so that the user can select memes from multiple searches. This implies that the selection state is stored globally.
+
+When the user clicks "Download N Memes", the client should POST the list of selected memes to the API. The API should respond with a zip file containing the original files for each selected meme, without any further compression (since images files are already compressed).
