@@ -76,9 +76,11 @@ npm run serve
 ## Commands
 
 - `npm run dev` - Start the development server
+- `npm run dev:client` - Start the React development server
 - `npm run serve` - Start the web UI server
 - `npm run import <path>` - Import memes from a directory
-- `npm run build` - Build the project
+- `npm run build` - Build the project (server and client)
+- `npm run build:client` - Build only the client
 - `npm run lint` - Run ESLint
 - `npm test` - Run tests
 

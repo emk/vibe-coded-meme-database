@@ -5,13 +5,19 @@
 # Install dependencies
 npm install
 
-# Run development server
+# Run backend development server
 npm run dev
+
+# Run React frontend development server
+npm run dev:client
+
+# Run both backend and frontend in development mode
+npm run dev:all
 
 # Import memes
 npm run import <path>
 
-# Serve web UI
+# Build and serve production web UI
 npm run serve
 
 # Run database migrations
@@ -55,7 +61,7 @@ memedb/
 - **Database**: SQLite via better-sqlite3 with Kysely for type-safe queries and migrations
 - **AI Integration**: Ollama API for image analysis
 - **Image Processing**: Sharp for thumbnail generation
-- **Frontend**: HTML/CSS/JavaScript
+- **Frontend**: React, TypeScript, Vite
 
 ## Code Style Guidelines
 - **Language**: TypeScript for both backend and frontend

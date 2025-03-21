@@ -20,8 +20,9 @@ app.use(cors({
 app.use(express.json({
   limit: '1mb' // Limit request body size
 }));
-app.use(express.static(path.join(__dirname, '../public'), {
-  maxAge: '1d' // Set cache headers
+// Serve static files from the React build
+app.use(express.static(path.join(__dirname, '../dist/client'), {
+  maxAge: '1d'
 }));
 
 // Initialize database
@@ -111,9 +112,9 @@ app.get<CategoryFilenameParams>('/images/:category/:filename', (req, res) => {
   res.sendFile(resolvedPath);
 });
 
-// Serve the main frontend
+// Serve the React frontend
 app.get('/', (_req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(__dirname, '../dist/client/index.html'));
 });
 
 // Start the server with async initialization
