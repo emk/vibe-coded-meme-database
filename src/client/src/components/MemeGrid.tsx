@@ -1,6 +1,7 @@
 import React from 'react';
 import { Meme } from '../types/Meme';
 import { MemeCard } from './MemeCard';
+import styles from './MemeGrid.module.css';
 
 interface MemeGridProps {
   memes: Meme[];
@@ -22,9 +23,9 @@ export const MemeGrid: React.FC<MemeGridProps> = ({ memes, loading, error }) => 
   }
 
   return (
-    <div className="meme-grid">
+    <div className={styles.memeGrid}>
       {memes.length === 200 && (
-        <div className="limit-notice">
+        <div className={styles.limitNotice}>
           Showing the 200 most recent memes. Use search to narrow results.
         </div>
       )}

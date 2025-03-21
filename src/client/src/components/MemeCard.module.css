@@ -1,0 +1,28 @@
+.memeCard {
+  background-color: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.memeCard img {
+  width: 100%;
+  height: auto;
+}
+
+.memeInfo {
+  padding: 10px;
+}
+
+.memeKeywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.keyword {
+  background-color: #eee;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+}

@@ -1,0 +1,16 @@
+.memeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.limitNotice {
+  grid-column: 1 / -1;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #fff3cd;
+  color: #856404;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+}

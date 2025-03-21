@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styles from './SearchBar.module.css';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -18,16 +19,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   };
 
   return (
-    <div className="search-container">
+    <div className={styles.searchContainer}>
       <input 
         type="text" 
-        id="search-input" 
+        className={styles.searchInput}
         placeholder="Search memes..." 
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyUp={handleKeyUp}
       />
-      <button id="search-btn" onClick={handleSearch}>Search</button>
+      <button className={styles.searchButton} onClick={handleSearch}>Search</button>
     </div>
   );
 };
