@@ -6,11 +6,11 @@
   "scripts": {
     "build": "tsc && npm run build:client",
     "build:client": "cd src/client && vite build",
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev": "nodemon --signal SIGTERM --exec ts-node src/index.ts",
     "dev:client": "cd src/client && vite",
     "start": "node dist/index.js",
     "serve": "npm run build && npm run start",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev:client\"",
+    "dev:all": "concurrently --kill-others \"npm run dev\" \"npm run dev:client\"",
     "import": "ts-node src/scripts/import.ts",
     "analyze": "ts-node src/scripts/analyze.ts",
     "clear-db": "ts-node src/scripts/clear-db.ts",

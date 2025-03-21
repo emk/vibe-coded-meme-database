@@ -209,12 +209,32 @@ async function startServer() {
     // Initialize the database and run migrations
     await db.init();
     
-    app.listen(PORT, '127.0.0.1', () => {
+    const server = app.listen(PORT, '127.0.0.1', () => {
       console.log(`Server running on http://localhost:${PORT}`);
       console.log('Use the following commands:');
       console.log(`- To import memes: npm run import <path-to-image-folder>`);
       console.log(`- Web UI available at: http://localhost:${PORT}`);
     });
+    
+    // Handle graceful shutdown
+    const shutdown = async () => {
+      console.log('Shutting down server...');
+      server.close(async () => {
+        console.log('Server closed. Closing database connection...');
+        await db.close();
+        console.log('Database connection closed. Exiting.');
+        process.exit(0);
+      });
+      
+      // If server doesn't close in 5 seconds, force exit
+      setTimeout(() => {
+        console.log('Server took too long to close. Forcing exit.');
+        process.exit(1);
+      }, 5000);
+    };
+
+    process.on('SIGINT', shutdown);
+    process.on('SIGTERM', shutdown);
   } catch (error) {
     console.error('Failed to initialize database:', error);
     process.exit(1);
