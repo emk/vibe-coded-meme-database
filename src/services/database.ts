@@ -114,6 +114,19 @@ export class DatabaseService {
     
     return this.mapRowToMeme(row);
   }
+  
+  // Get multiple memes by IDs
+  public async getMemesByIds(ids: number[]): Promise<Meme[]> {
+    if (ids.length === 0) return [];
+    
+    const rows = await this.db
+      .selectFrom('memes')
+      .selectAll()
+      .where('id', 'in', ids)
+      .execute();
+      
+    return rows.map(row => this.mapRowToMeme(row));
+  }
 
   // Close database connection
   public async close(): Promise<void> {

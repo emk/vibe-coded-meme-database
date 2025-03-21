@@ -3,6 +3,7 @@ import path from 'path';
 import cors from 'cors';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import archiver from 'archiver';
 import { DatabaseService } from './services/database';
 
 // Load environment variables
@@ -15,7 +16,7 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 // Middleware
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*', // Restrict CORS to specific origin if configured
-  methods: ['GET']
+  methods: ['GET', 'POST'] // Allow POST for zip download
 }));
 app.use(express.json({
   limit: '1mb' // Limit request body size
@@ -73,6 +74,91 @@ app.get<MemeIdParams>('/api/memes/:id', async (req, res) => {
     console.error('Error fetching meme by ID:', error);
     res.status(500).json({ error: 'Failed to fetch meme' });
     // Don't expose error details to the client
+  }
+});
+
+// Download selected memes as a zip file
+app.post('/api/memes/download', async (req, res) => {
+  try {
+    const { ids } = req.body;
+    
+    // Validate input - ids must be an array of numbers
+    if (!Array.isArray(ids) || ids.length === 0 || !ids.every(id => typeof id === 'number')) {
+      res.status(400).json({ error: 'Invalid or empty meme selection' });
+      return;
+    }
+    
+    // Fetch meme details from database by IDs in a single query
+    const memes = await db.getMemesByIds(ids);
+    
+    if (memes.length === 0) {
+      res.status(404).json({ error: 'No valid memes found' });
+      return;
+    }
+    
+    // Set up the response headers for a zip file download
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename=selected-memes.zip');
+    
+    // Create a zip archive with no compression for image files (already compressed)
+    const archive = archiver('zip', {
+      zlib: { level: 0 }
+    });
+    
+    // Pipe the archive to the response
+    archive.pipe(res);
+    
+    // Set up error handling for the archive
+    archive.on('error', (err) => {
+      console.error('Archive error:', err);
+      // Only send an error response if headers haven't been sent yet
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Failed to create zip file' });
+      } else {
+        res.end();
+      }
+    });
+    
+    const memeDir = process.env.MEME_DIR || './memedb/memes';
+    
+    // Add each meme to the archive within a top-level directory
+    for (const meme of memes) {
+      if (!meme) continue;
+      
+      // Get the file extension from the path
+      const fileExt = meme.path.substring(meme.path.lastIndexOf('.'));
+      
+      // Create the source file path
+      const filePath = path.join(memeDir, meme.category, meme.filename + fileExt);
+      
+      // Skip if file doesn't exist
+      if (!fs.existsSync(filePath)) {
+        console.warn(`File not found: ${filePath}`);
+        continue;
+      }
+      
+      // Validate that the resolved path is within the meme directory (security)
+      const resolvedPath = path.resolve(filePath);
+      const resolvedMemeDir = path.resolve(memeDir);
+      
+      if (!resolvedPath.startsWith(resolvedMemeDir)) {
+        console.warn(`Security check failed for path: ${filePath}`);
+        continue;
+      }
+      
+      // Add file to zip with the top-level directory structure
+      archive.file(filePath, { name: `selected-memes/${meme.filename}${fileExt}` });
+    }
+    
+    // Finalize the archive
+    await archive.finalize();
+    
+  } catch (error) {
+    console.error('Error creating zip file:', error);
+    // Only send an error response if headers haven't been sent yet
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Failed to create zip file' });
+    }
   }
 });
 

@@ -3,11 +3,44 @@
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.imageContainer {
+  position: relative;
 }
 
 .memeCard img {
   width: 100%;
   height: auto;
+  display: block;
+}
+
+.checkbox {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: transparent;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.checkbox.selected {
+  background-color: rgba(76, 175, 80, 0.8);
+  color: white;
+}
+
+.checkbox:hover {
+  transform: scale(1.1);
 }
 
 .memeInfo {
