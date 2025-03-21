@@ -3,7 +3,7 @@
 /memedb/
 
 # Documentation.
-/OLLAMA_API_DOCS.md
+/api-docs/
 
 # Dependencies
 node_modules/
