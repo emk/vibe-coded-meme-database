@@ -34,6 +34,9 @@ npm test -- -t "test name"
 
 # Lint code
 npm run lint
+
+# Run linting and build (recommended before committing)
+npm run check
 ```
 
 ## Project Overview

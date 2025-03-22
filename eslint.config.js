@@ -3,11 +3,16 @@ const tsparser = require("@typescript-eslint/parser");
 
 module.exports = [
   {
-    files: ["**/*.ts"],
+    files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parser: tsparser,
       ecmaVersion: 2020,
       sourceType: "module",
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
+      }
     },
     plugins: {
       "@typescript-eslint": tseslint,

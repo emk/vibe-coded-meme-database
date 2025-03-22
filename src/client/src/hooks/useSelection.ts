@@ -1,5 +1,4 @@
-import { useState, createContext, useContext } from 'react';
-import { Meme } from '../types/Meme';
+import { useState, createContext } from 'react';
 
 interface SelectionContextType {
   selectedMemes: Set<number>;
