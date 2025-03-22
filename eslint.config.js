@@ -3,6 +3,9 @@ const tsparser = require("@typescript-eslint/parser");
 
 module.exports = [
   {
+    ignores: ["**/coverage/**", "**/coverage-client/**"],
+  },
+  {
     files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parser: tsparser,

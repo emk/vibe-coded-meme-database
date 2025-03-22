@@ -140,8 +140,8 @@ describe('API Routes', () => {
     // Clean up test files and directories
     try {
       fs.unlinkSync(dbPath);
-      fs.rmdirSync(path.dirname(dbPath), { recursive: true });
-      fs.rmdirSync(memeDir, { recursive: true });
+      fs.rmSync(path.dirname(dbPath), { recursive: true, force: true });
+      fs.rmSync(memeDir, { recursive: true, force: true });
     } catch (err) {
       console.warn(`Failed to clean up test files: ${err}`);
     }

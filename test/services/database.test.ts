@@ -27,7 +27,7 @@ describe('DatabaseService', () => {
     // Remove the test database file
     try {
       fs.unlinkSync(dbPath);
-      fs.rmdirSync(path.dirname(dbPath));
+      fs.rmSync(path.dirname(dbPath), { recursive: true, force: true });
     } catch (err) {
       console.warn(`Failed to clean up test database: ${err}`);
     }

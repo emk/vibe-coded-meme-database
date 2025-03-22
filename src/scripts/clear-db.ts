@@ -34,7 +34,7 @@ async function clearDatabase(): Promise<void> {
         fs.readdirSync(categoryPath).forEach(file => {
           fs.unlinkSync(path.join(categoryPath, file));
         });
-        fs.rmdirSync(categoryPath);
+        fs.rmSync(categoryPath, { recursive: true, force: true });
       } else {
         fs.unlinkSync(categoryPath);
       }
