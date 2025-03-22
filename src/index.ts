@@ -96,9 +96,19 @@ app.post('/api/memes/download', async (req, res) => {
       return;
     }
     
+    // Generate date-time string in YYYYMMDD-HHMMSS format
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const timeStr = now.toISOString().slice(11, 19).replace(/:/g, '');
+    const dateTime = `${dateStr}-${timeStr}`;
+    
+    // Use the same base name for both the zip file and the folder
+    const baseName = `selected-memes-${dateTime}`;
+    const zipFilename = `${baseName}.zip`;
+    
     // Set up the response headers for a zip file download
     res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', 'attachment; filename=selected-memes.zip');
+    res.setHeader('Content-Disposition', `attachment; filename=${zipFilename}`);
     
     // Create a zip archive with no compression for image files (already compressed)
     const archive = archiver('zip', {
@@ -147,7 +157,7 @@ app.post('/api/memes/download', async (req, res) => {
       }
       
       // Add file to zip with the top-level directory structure
-      archive.file(filePath, { name: `selected-memes/${meme.filename}${fileExt}` });
+      archive.file(filePath, { name: `${baseName}/${meme.filename}${fileExt}` });
     }
     
     // Finalize the archive

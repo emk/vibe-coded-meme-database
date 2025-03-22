@@ -35,10 +35,20 @@ export const SelectionFooter: React.FC = () => {
       // Create a URL for the blob
       const url = window.URL.createObjectURL(blob);
       
+      // Get filename from Content-Disposition header if available
+      let filename = 'selected-memes.zip';
+      const contentDisposition = response.headers.get('Content-Disposition');
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename=([^;]+)/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1].replace(/["']/g, '');
+        }
+      }
+      
       // Create a temporary link and click it to download
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'selected-memes.zip';
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       
