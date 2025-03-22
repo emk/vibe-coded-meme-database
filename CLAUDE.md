@@ -96,3 +96,39 @@ memedb/
 - **Documentation**: When complex solutions are needed, consult proper documentation instead of guessing.
 - **Testing**: Ensure all fixes are properly tested before moving on.
 - **Code Quality**: Maintain high standards even when solving difficult problems.
+
+## Testing Strategy
+
+### Running Tests
+```bash
+# Run all tests (currently server-side only)
+npm test
+
+# Run server-side tests (database and API)
+npm run test:server
+
+# Run a specific test file
+npm test -- path/to/test.test.ts
+
+# Run tests with a specific name pattern
+npm test -- -t "pattern"
+
+# Run tests with coverage report
+npm test -- --coverage
+```
+
+### Testing Philosophy
+- **Real Database Tests**: Database tests use real SQLite databases instead of mocks.
+- **Minimal Mocking**: Only mock external services (Ollama API) and API calls for frontend tests.
+- **Independent Tests**: Each test should be isolated and not affect other tests.
+
+### Test Structure
+- **Backend Tests**: Use temporary SQLite databases with real migrations.
+- **API Tests**: Test Express routes with SuperTest.
+- **Frontend Tests**: Test React hooks and components with React Testing Library.
+
+### Before Committing Code
+Always run linting, tests, and build before committing:
+```bash
+npm run check  # Runs lint, test, and build in sequence
+```
