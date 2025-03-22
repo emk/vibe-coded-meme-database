@@ -53,18 +53,15 @@ describe('MemeCard Component', () => {
   });
 
   test('toggles meme selection when checkbox is clicked', () => {
-    render(
+    const { container } = render(
       <SelectionContext.Provider value={mockSelectionContext}>
         <MemeCard meme={mockMeme} />
       </SelectionContext.Provider>
     );
     
-    // Simulate mouse hover to show the checkbox
-    const imageContainer = screen.getByRole('img').parentElement;
-    fireEvent.mouseEnter(imageContainer!);
-    
-    // Find and click the checkbox
-    const checkbox = screen.getByRole('img').parentElement!.querySelector('div[class*="checkbox"]');
+    // Find and click the checkbox using its unique class
+    const checkbox = container.querySelector('.meme-selection-checkbox');
+    expect(checkbox).not.toBeNull();
     fireEvent.click(checkbox!);
     
     // Verify that toggleMeme was called with the correct ID

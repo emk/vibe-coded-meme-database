@@ -101,11 +101,14 @@ memedb/
 
 ### Running Tests
 ```bash
-# Run all tests (currently server-side only)
+# Run all tests
 npm test
 
 # Run server-side tests (database and API)
 npm run test:server
+
+# Run client-side tests (React components and hooks)
+npm run test:client
 
 # Run a specific test file
 npm test -- path/to/test.test.ts

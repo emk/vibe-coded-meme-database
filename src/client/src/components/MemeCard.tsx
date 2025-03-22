@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Meme } from '../types/Meme';
 import { SelectionContext } from '../hooks/useSelection';
 import styles from './MemeCard.module.css';
@@ -8,7 +8,6 @@ interface MemeCardProps {
 }
 
 export const MemeCard: React.FC<MemeCardProps> = ({ meme }) => {
-  const [isHovering, setIsHovering] = useState(false);
   const { toggleMeme, isSelected } = useContext(SelectionContext);
   const selected = isSelected(meme.id);
   
@@ -27,21 +26,15 @@ export const MemeCard: React.FC<MemeCardProps> = ({ meme }) => {
   };
   
   return (
-    <div 
-      className={styles.memeCard}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-    >
+    <div className={styles.memeCard}>
       <div className={styles.imageContainer}>
         <img src={imagePath} alt={altText} title={altText} />
-        {(isHovering || selected) && (
-          <div 
-            className={`${styles.checkbox} ${selected ? styles.selected : ''}`}
-            onClick={handleToggleSelect}
-          >
-            {selected ? '✓' : ''}
-          </div>
-        )}
+        <div 
+          className={`${styles.checkbox} meme-selection-checkbox ${selected ? styles.selected : ''}`}
+          onClick={handleToggleSelect}
+        >
+          {selected ? '✓' : ''}
+        </div>
       </div>
       <div className={styles.memeInfo}>
         <div className={styles.memeKeywords}>

@@ -18,7 +18,8 @@
     "migrate": "ts-node src/scripts/migrate.ts",
     "lint": "eslint . --ext .ts,.tsx",
     "test:server": "jest --testPathPattern='test/(api|services)'",
-    "test": "npm run test:server",
+    "test:client": "jest --config=jest.client.config.js",
+    "test": "npm run test:server && npm run test:client",
     "check": "npm run lint && npm run test && npm run build"
   },
   "keywords": [

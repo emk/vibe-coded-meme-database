@@ -32,6 +32,14 @@
   color: transparent;
   font-weight: bold;
   transition: all 0.2s ease;
+  /* Hide by default, show on hover or when selected */
+  opacity: 0;
+}
+
+/* Show checkbox on hover or when selected */
+.imageContainer:hover .checkbox,
+.checkbox.selected {
+  opacity: 1;
 }
 
 .checkbox.selected {
