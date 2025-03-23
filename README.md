@@ -18,14 +18,17 @@ Other human-written bits added to make this more useful:
 
 - Import memes from a local directory
 - Automatic meme categorization with AI
-- Search memes by text or keywords
-- Web UI for browsing memes
+- Text extraction from meme images
+- Keyword generation and categorization 
+- Search memes by text, description, or keywords
+- Web UI for browsing and searching memes
+- Duplicate detection using SHA256 hash
 
 ## Requirements
 
 - Node.js (v18+)
 - npm
-- Ollama (v0.6.0+) with the gemma3 model installed
+- Ollama (v0.6.0+) with the gemma3:27b model installed
 
 ## Getting Started
 
@@ -38,7 +41,13 @@ npm install
 
 3. Configure the environment variables (optional)
 
-Copy `.env` to `.env.local` and modify the settings as needed.
+```
+PORT - Server port (default: 3000)
+DB_PATH - Path to SQLite database (default: './memedb/memes.sqlite3')
+MEME_DIR - Directory for storing meme files (default: './memedb/memes')
+OLLAMA_HOST - Ollama API host (default: 'http://localhost:11434')
+AI_MODEL - AI model to use (default: 'gemma3:27b')
+```
 
 4. Start Ollama server with your preferred model
 
@@ -67,23 +76,65 @@ npm run serve
   - `memes/$CATEGORY/$FILENAME.$EXT` - Organized meme images
 - `src/` - Source code
   - `index.ts` - Main entry point and Express server
-  - `scripts/` - Import script
+  - `client/` - React frontend
+    - `src/` - Client source code
+      - `App.tsx` - Main React application component
+      - `components/` - React UI components
+      - `hooks/` - React custom hooks
+      - `types/` - TypeScript type definitions
+  - `scripts/` - Import and database management scripts
   - `services/` - Database and AI services
   - `models/` - Data models
+  - `migrations/` - Database migration files
   - `utils/` - Utility functions
-- `public/` - Web UI files
 
 ## Commands
 
-- `npm run dev` - Start the development server
-- `npm run dev:client` - Start the React development server
-- `npm run serve` - Start the web UI server
+- `npm run dev` - Start the backend development server
+- `npm run dev:client` - Start the React frontend development server
+- `npm run dev:all` - Run both backend and frontend in development mode
+- `npm run serve` - Build and serve production web UI
 - `npm run import <path>` - Import memes from a directory
+- `npm run migrate` - Run database migrations
+- `npm run clear-db` - Clear database (use with caution)
 - `npm run build` - Build the project (server and client)
-- `npm run build:client` - Build only the client
 - `npm run lint` - Run ESLint
-- `npm test` - Run tests
+- `npm test` - Run all tests
+- `npm run test:server` - Run server-side tests
+- `npm run test:client` - Run client-side tests
+- `npm run check` - Run linting, tests, and build (recommended before committing)
+
+## Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run server-side tests (database and API)
+npm run test:server
+
+# Run client-side tests (React components and hooks)
+npm run test:client
+
+# Run a specific test file
+npm test -- path/to/test.test.ts
+
+# Run tests with a specific name pattern
+npm test -- -t "pattern"
+
+# Run tests with coverage report
+npm test -- --coverage
+```
 
 ## License
 
-ISC
+This work is dedicated to the public domain under CC0 1.0 Universal. You can copy, modify, distribute, and use this work for any purpose, commercial or non-commercial, without asking permission.
+
+Key points:
+- No restrictions on use
+- No warranty or liability
+- Worldwide, perpetual rights
+
+For full terms, see the [CC0 1.0 Universal license](LICENSE.txt).
+
+**DISCLAIMER**: This project was created as an AI coding experiment. Most of the code was written by Claude Code and has not been thoroughly reviewed by humans. Users should exercise caution as the code may contain undetected security vulnerabilities or other issues.
