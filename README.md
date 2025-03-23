@@ -128,6 +128,8 @@ npm test -- --coverage
 
 ## License
 
+> **Note from the human:** I have no idea of the copyright status of works written almost entirely by Claude Code based on human instructions and feedback. I've written only tiny portions of this project directly, on the order of 20 lines of code. But to whatever extent my personal copyright applies here, I place this code under CC0 as described below. Note particularly the lack of warranty. It's likely that some parts of this code have never been _read_ by a human.
+
 This work is dedicated to the public domain under CC0 1.0 Universal. You can copy, modify, distribute, and use this work for any purpose, commercial or non-commercial, without asking permission.
 
 Key points:
