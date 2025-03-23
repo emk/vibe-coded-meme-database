@@ -20,7 +20,7 @@ Other human-written bits added to make this more useful:
 - Automatic meme categorization with AI
 - Text extraction from meme images
 - Keyword generation and categorization 
-- Search memes by text, description, or keywords
+- Search memes by text, description, or keywords using SQLite FTS5
 - Web UI for browsing and searching memes
 - Duplicate detection using SHA256 hash
 
@@ -103,6 +103,32 @@ npm run serve
 - `npm run test:server` - Run server-side tests
 - `npm run test:client` - Run client-side tests
 - `npm run check` - Run linting, tests, and build (recommended before committing)
+
+## Search Capabilities
+
+The meme database supports full-text search using SQLite's FTS5 extension. Search is performed across meme text, descriptions, keywords, and filenames.
+
+### Sample Queries
+
+- Simple word search: `cat`
+- Multiple words (implicit AND): `cat dog` (finds memes with both words)
+- Exact phrase: `"surprised pikachu"` (words must appear in this order)
+- OR operator: `cat OR dog` (finds memes with either term)
+- AND operator: `cat AND dog` (same as implicit AND)
+- Grouping: `pikachu AND (surprised OR detective)`
+- Proximity search: `NEAR(cat dog, 5)` (terms must be within 5 words of each other)
+- Prefix search: `meme*` (matches "meme", "memes", "memetic", etc.)
+- Field-specific search: `text:pikachu keywords:pokemon`
+
+### Search Tips
+
+- Searches are case-insensitive
+- Common words ("stopwords") are ignored
+- Multiple terms without operators use implicit AND logic
+- Prefix searches use the * wildcard (e.g., `program*` matches "program", "programming")
+- NEAR operator finds terms within a specified distance (e.g., `NEAR(term1 term2, 5)`)
+- Use parentheses to group expressions for complex queries
+- Field-specific searches can target: text, description, keywords, or filename
 
 ## Testing
 

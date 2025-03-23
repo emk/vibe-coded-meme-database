@@ -108,8 +108,8 @@ describe('DatabaseService', () => {
       .toBeGreaterThanOrEqual(new Date(memes[1].created_at).getTime());
   });
 
-  // Test search functionality
-  test('searchMemes should find memes matching the query', async () => {
+  // Basic search functionality
+  test('searchMemes should find memes matching a simple query', async () => {
     // Add memes with specific text for searching
     await dbService.addMeme({
       ...sampleMeme,
@@ -132,13 +132,142 @@ describe('DatabaseService', () => {
     expect(results.length).toBeGreaterThanOrEqual(2);
     
     // Check that our two test memes are found
-    const texts = results.map(m => m.text);
-    const descriptions = results.map(m => m.description);
-    
-    expect(
-      texts.includes('Unique search term alpha') || 
-      descriptions.includes('But contains alpha in description')
-    ).toBe(true);
+    const foundHashesSet = new Set(results.map(m => m.hash));
+    expect(foundHashesSet.has('search-hash-1')).toBe(true);
+    expect(foundHashesSet.has('search-hash-2')).toBe(true);
+  });
+
+  // Test advanced search features
+  describe('FTS5 search capabilities', () => {
+    beforeAll(async () => {
+      // Add a variety of memes for testing different search features
+      await dbService.addMeme({
+        ...sampleMeme,
+        hash: 'fts-test-1',
+        text: 'Surprised pikachu meme',
+        description: 'A yellow pokemon looking surprised',
+        keywords: ['surprised', 'pikachu', 'pokemon', 'reaction']
+      });
+
+      await dbService.addMeme({
+        ...sampleMeme,
+        hash: 'fts-test-2',
+        text: 'Distracted boyfriend meme',
+        description: 'Guy looking at another woman while with girlfriend',
+        keywords: ['distracted', 'boyfriend', 'jealous', 'reaction']
+      });
+
+      await dbService.addMeme({
+        ...sampleMeme,
+        hash: 'fts-test-3',
+        text: 'Pikachu detective movie poster',
+        description: 'Promotional image from the movie',
+        keywords: ['pikachu', 'detective', 'movie', 'pokemon']
+      });
+
+      await dbService.addMeme({
+        ...sampleMeme,
+        hash: 'fts-test-4',
+        text: 'Programming bug meme',
+        description: 'When your code works but you dont know why',
+        keywords: ['programming', 'code', 'bug', 'work']
+      });
+
+      await dbService.addMeme({
+        ...sampleMeme,
+        hash: 'fts-test-5',
+        text: 'Working from home programming meme',
+        description: 'Programmer in pajamas with coffee',
+        keywords: ['work', 'home', 'programming', 'remote']
+      });
+    });
+
+    // Test exact phrase search
+    test('should find exact phrases with quotes', async () => {
+      const results = await dbService.searchMemes('"surprised pikachu"');
+      
+      expect(results.length).toBeGreaterThanOrEqual(1);
+      expect(results.some(m => m.hash === 'fts-test-1')).toBe(true);
+      
+      // Should not match partial phrases
+      expect(results.some(m => m.hash === 'fts-test-3')).toBe(false);
+    });
+
+    // Test OR operator
+    test('should handle OR queries correctly', async () => {
+      const results = await dbService.searchMemes('boyfriend OR detective');
+      
+      expect(results.length).toBeGreaterThanOrEqual(2);
+      const foundHashes = results.map(m => m.hash);
+      expect(foundHashes).toContain('fts-test-2'); // boyfriend
+      expect(foundHashes).toContain('fts-test-3'); // detective
+    });
+
+    // Test AND operator (implicit in FTS5)
+    test('should handle implicit AND queries', async () => {
+      const results = await dbService.searchMemes('pikachu pokemon');
+      
+      expect(results.length).toBeGreaterThanOrEqual(2);
+      const foundHashes = results.map(m => m.hash);
+      expect(foundHashes).toContain('fts-test-1'); // has both terms
+      expect(foundHashes).toContain('fts-test-3'); // has both terms
+    });
+
+    // Test prefix search
+    test('should handle prefix searches with wildcard', async () => {
+      const results = await dbService.searchMemes('program*');
+      
+      expect(results.length).toBeGreaterThanOrEqual(2);
+      const foundHashes = results.map(m => m.hash);
+      expect(foundHashes).toContain('fts-test-4'); // programming
+      expect(foundHashes).toContain('fts-test-5'); // programming
+    });
+
+    // Test column-specific search
+    test('should handle column-specific searches', async () => {
+      const results = await dbService.searchMemes('description:pokemon');
+      
+      expect(results.length).toBeGreaterThanOrEqual(1);
+      expect(results.some(m => m.hash === 'fts-test-1')).toBe(true);
+      
+      // Test with keywords field
+      const keywordResults = await dbService.searchMemes('keywords:pokemon');
+      expect(keywordResults.some(m => m.hash === 'fts-test-1')).toBe(true);
+      expect(keywordResults.some(m => m.hash === 'fts-test-3')).toBe(true);
+    });
+
+    // Test NEAR operator
+    test('should handle NEAR operator for proximity searches', async () => {
+      // Add a meme with terms near each other
+      await dbService.addMeme({
+        ...sampleMeme,
+        hash: 'fts-test-6',
+        text: 'This is a very funny reaction meme about humor',
+        description: 'Humorous content for reactions',
+        keywords: ['funny', 'reaction', 'humor']
+      });
+
+      // First test with a simple search to ensure the meme is findable
+      const basicResults = await dbService.searchMemes('funny');
+      expect(basicResults.some(m => m.hash === 'fts-test-6')).toBe(true);
+      
+      // Then test with the NEAR operator syntax
+      // FTS5 NEAR syntax is 'NEAR(term1 term2, distance)'
+      const results = await dbService.searchMemes('NEAR(funny reaction, 10)');
+      
+      expect(results.length).toBeGreaterThanOrEqual(1);
+      expect(results.some(m => m.hash === 'fts-test-6')).toBe(true);
+    });
+
+    // Test combined query with parentheses
+    test('should handle grouped expressions with parentheses', async () => {
+      const results = await dbService.searchMemes('pikachu AND (surprised OR detective)');
+      
+      expect(results.length).toBeGreaterThanOrEqual(2);
+      const foundHashes = results.map(m => m.hash);
+      expect(foundHashes).toContain('fts-test-1'); // pikachu and surprised
+      expect(foundHashes).toContain('fts-test-3'); // pikachu and detective
+    });
   });
 
   // Test getting memes by IDs
