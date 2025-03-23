@@ -136,6 +136,13 @@ It is mandatory to run linting, tests, and build before committing. All tests mu
 npm run check  # Runs lint, test, and build in sequence
 ```
 
+A pre-commit hook has been set up to automatically run `npm run check` before each commit. This ensures that only code that passes linting, tests, and builds successfully can be committed.
+
+If you need to bypass the pre-commit hook in exceptional circumstances (NOT RECOMMENDED), you can use the `--no-verify` flag:
+```bash
+git commit --no-verify -m "Your message"
+```
+
 IMPORTANT: NEVER commit code unless `npm run check` passes completely. If there are any failing tests or linting errors, they must be fixed before proceeding with a commit.
 
 ## Security Policy
