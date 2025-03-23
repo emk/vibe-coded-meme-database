@@ -18,8 +18,8 @@ function App() {
     <SelectionContext.Provider value={selectionState}>
       <div className={styles.container}>
         <h1 className={styles.title}>Meme Database</h1>
-        <SearchBar onSearch={handleSearch} />
-        <MemeGrid memes={memes} loading={loading} error={error} />
+        <SearchBar onSearch={handleSearch} error={error} />
+        {!error && <MemeGrid memes={memes} loading={loading} />}
         <SelectionFooter />
       </div>
     </SelectionContext.Provider>

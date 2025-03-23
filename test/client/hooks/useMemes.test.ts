@@ -52,10 +52,11 @@ describe('useMemes Hook', () => {
   });
 
   test('should handle API errors', async () => {
-    // Mock API error
+    // Mock API error with error response
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: false,
-      status: 500
+      status: 500,
+      json: async () => ({ error: 'Failed to fetch memes' })
     });
     
     const { result } = renderHook(() => useMemes());
@@ -68,7 +69,7 @@ describe('useMemes Hook', () => {
     // Should have error state
     expect(result.current.loading).toBe(false);
     expect(result.current.memes).toEqual([]);
-    expect(result.current.error).toContain('API error: 500');
+    expect(result.current.error).toBe('Failed to fetch memes');
   });
 
   test('should fetch memes with search query', async () => {

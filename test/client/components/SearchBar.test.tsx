@@ -10,16 +10,22 @@ describe('SearchBar Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+  
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
 
-  test('renders search input and button', () => {
+  test('renders search input and buttons', () => {
     render(<SearchBar onSearch={mockOnSearch} />);
     
-    // Check that input and button exist
+    // Check that input and buttons exist
     const input = screen.getByPlaceholderText('Search memes...');
-    const button = screen.getByRole('button', { name: /search/i });
+    const searchButton = screen.getByText('Search');
+    const helpButton = screen.getByRole('button', { name: /search syntax help/i });
     
     expect(input).toBeInTheDocument();
-    expect(button).toBeInTheDocument();
+    expect(searchButton).toBeInTheDocument();
+    expect(helpButton).toBeInTheDocument();
   });
 
   test('updates input value when typing', () => {
@@ -38,7 +44,7 @@ describe('SearchBar Component', () => {
     render(<SearchBar onSearch={mockOnSearch} />);
     
     const input = screen.getByPlaceholderText('Search memes...');
-    const button = screen.getByRole('button', { name: /search/i });
+    const button = screen.getByText('Search');
     
     // Type something and click search
     fireEvent.change(input, { target: { value: 'test query' } });
@@ -72,5 +78,34 @@ describe('SearchBar Component', () => {
     
     // Check that onSearch was not called
     expect(mockOnSearch).not.toHaveBeenCalled();
+  });
+
+  test('displays error message when provided', () => {
+    render(<SearchBar onSearch={mockOnSearch} error="Test error message" />);
+    
+    // Check that the error message is displayed
+    const errorElement = screen.getByText('Test error message');
+    expect(errorElement).toBeInTheDocument();
+  });
+
+  // Test that the help button shows/hides help
+  test('toggles help panel when help button is clicked', () => {
+    render(<SearchBar onSearch={mockOnSearch} />);
+    
+    // Initially help panel should not be visible
+    expect(screen.queryByRole('heading', { name: 'Search Syntax' })).not.toBeInTheDocument();
+    
+    // Click help button
+    const helpButton = screen.getByRole('button', { name: /search syntax help/i });
+    fireEvent.click(helpButton);
+    
+    // Now help panel should be visible
+    expect(screen.getByRole('heading', { name: 'Search Syntax' })).toBeInTheDocument();
+    
+    // Click help button again to hide panel
+    fireEvent.click(helpButton);
+    
+    // Help panel should be hidden again
+    expect(screen.queryByRole('heading', { name: 'Search Syntax' })).not.toBeInTheDocument();
   });
 });

@@ -131,10 +131,12 @@ npm test -- --coverage
 - **Frontend Tests**: Test React hooks and components with React Testing Library.
 
 ### Before Committing Code
-Always run linting, tests, and build before committing:
+It is mandatory to run linting, tests, and build before committing. All tests must pass and there should be no linting errors:
 ```bash
 npm run check  # Runs lint, test, and build in sequence
 ```
+
+IMPORTANT: NEVER commit code unless `npm run check` passes completely. If there are any failing tests or linting errors, they must be fixed before proceeding with a commit.
 
 ## Security Policy
 

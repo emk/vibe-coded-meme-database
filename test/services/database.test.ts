@@ -268,6 +268,17 @@ describe('DatabaseService', () => {
       expect(foundHashes).toContain('fts-test-1'); // pikachu and surprised
       expect(foundHashes).toContain('fts-test-3'); // pikachu and detective
     });
+    
+    // Test NOT operator
+    test('should handle NOT operator for exclusion', async () => {
+      // Should find pikachu memes that are not detective-related
+      const results = await dbService.searchMemes('pikachu NOT detective');
+      
+      expect(results.length).toBeGreaterThanOrEqual(1);
+      const foundHashes = results.map(m => m.hash);
+      expect(foundHashes).toContain('fts-test-1'); // pikachu surprised (not detective)
+      expect(foundHashes).not.toContain('fts-test-3'); // pikachu detective (excluded)
+    });
   });
 
   // Test getting memes by IDs

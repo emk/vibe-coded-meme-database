@@ -115,6 +115,7 @@ The meme database supports full-text search using SQLite's FTS5 extension. Searc
 - Exact phrase: `"surprised pikachu"` (words must appear in this order)
 - OR operator: `cat OR dog` (finds memes with either term)
 - AND operator: `cat AND dog` (same as implicit AND)
+- NOT operator: `cat NOT dog` (finds memes with "cat" but not "dog")
 - Grouping: `pikachu AND (surprised OR detective)`
 - Proximity search: `NEAR(cat dog, 5)` (terms must be within 5 words of each other)
 - Prefix search: `meme*` (matches "meme", "memes", "memetic", etc.)

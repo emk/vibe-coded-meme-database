@@ -25,7 +25,8 @@ export function useMemes(): UseMemeResult {
       
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message || errorData.error || `API error: ${response.status}`);
       }
       
       const data = await response.json();

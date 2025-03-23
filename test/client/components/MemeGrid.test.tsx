@@ -59,10 +59,7 @@ describe('MemeGrid Component', () => {
     expect(screen.getByText('Loading memes...')).toBeInTheDocument();
   });
 
-  test('shows error message', () => {
-    renderWithContext(<MemeGrid memes={[]} loading={false} error="Test error message" />);
-    expect(screen.getByText(/Error loading memes: Test error message/i)).toBeInTheDocument();
-  });
+  // Remove error test since error handling moved to SearchBar
 
   test('shows empty state message', () => {
     renderWithContext(<MemeGrid memes={[]} loading={false} error={null} />);

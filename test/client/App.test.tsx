@@ -10,7 +10,7 @@ jest.mock('../../src/client/src/hooks/useMemes');
 jest.mock('../../src/client/src/hooks/useSelection');
 // Mock the child components to simplify testing
 jest.mock('../../src/client/src/components/SearchBar', () => ({
-  SearchBar: ({ onSearch }) => (
+  SearchBar: ({ onSearch, error }) => (
     <div data-testid="mock-search-bar">
       <input 
         data-testid="search-input" 
@@ -18,14 +18,14 @@ jest.mock('../../src/client/src/components/SearchBar', () => ({
         onKeyUp={jest.fn()}
       />
       <button data-testid="search-button" onClick={() => onSearch('test query')}>Search</button>
+      {error && <span>Error: {error}</span>}
     </div>
   )
 }));
 jest.mock('../../src/client/src/components/MemeGrid', () => ({
-  MemeGrid: ({ memes, loading, error }) => (
+  MemeGrid: ({ memes, loading }) => (
     <div data-testid="mock-meme-grid">
       {loading && <span>Loading...</span>}
-      {error && <span>Error: {error}</span>}
       <span>Meme count: {memes.length}</span>
     </div>
   )

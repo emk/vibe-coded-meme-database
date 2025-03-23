@@ -6,16 +6,12 @@ import styles from './MemeGrid.module.css';
 interface MemeGridProps {
   memes: Meme[];
   loading: boolean;
-  error: string | null;
+  error?: string | null;
 }
 
-export const MemeGrid: React.FC<MemeGridProps> = ({ memes, loading, error }) => {
+export const MemeGrid: React.FC<MemeGridProps> = ({ memes, loading }) => {
   if (loading) {
     return <div>Loading memes...</div>;
-  }
-
-  if (error) {
-    return <div>Error loading memes: {error}</div>;
   }
 
   if (memes.length === 0) {

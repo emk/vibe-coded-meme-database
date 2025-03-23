@@ -50,8 +50,17 @@ app.get('/api/memes', async (req, res) => {
     res.json(memes);
   } catch (error) {
     console.error('Error fetching memes:', error);
-    res.status(500).json({ error: 'Failed to fetch memes' });
-    // Don't expose error details to the client
+    
+    // Only expose FTS5 syntax errors to the client
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('fts5: syntax error')) {
+      res.status(400).json({ 
+        error: 'Search syntax error: ' + errorMessage,
+        message: 'Check your syntax or click the ? button for help. Valid examples: "cat AND dog", "cat OR dog", "cat NOT dog", "program*", "NEAR(cat dog, 5)", etc.'
+      });
+    } else {
+      res.status(500).json({ error: 'Failed to fetch memes' });
+    }
   }
 });
 
