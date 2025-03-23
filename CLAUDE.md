@@ -135,3 +135,35 @@ Always run linting, tests, and build before committing:
 ```bash
 npm run check  # Runs lint, test, and build in sequence
 ```
+
+## Security Policy
+
+Security is a fundamental priority for this project. All code must be written with security best practices in mind to prevent common web vulnerabilities.
+
+### Security Context
+- Currently a single-user application running on localhost only
+- Future versions may expand beyond localhost, so all code should be written to be secure in multi-user contexts
+
+### Security Principles
+- **Security by Design**: Consider security implications during initial design, not as an afterthought
+- **Principle of Least Privilege**: Code should operate with the minimum privileges necessary
+- **Defense in Depth**: Implement multiple layers of security controls
+- **Input Validation**: Validate that all inputs meet their constraints, without attempting to filter/sanitize valid values
+- **Secure Output Handling**: Properly encode/escape all output based on context
+
+### Common Web Vulnerabilities to Prevent
+- **Cross-Site Scripting (XSS)**: Always use proper HTML escaping in frontend components
+- **Path Traversal**: Validate and sanitize all file paths, never use user input directly in file operations
+- **SQL Injection**: Use parameterized queries (already enforced by Kysely)
+- **Cross-Site Request Forgery (CSRF)**: Implement proper CSRF protections for state-changing operations
+- **Insecure Direct Object References**: Validate user has permission to access requested resources
+- **Sensitive Data Exposure**: Never log sensitive information or expose it in error messages
+- **Improper Error Handling**: Use custom error types, never expose stack traces to users
+- **Broken Access Control**: Implement proper authorization checks
+- **Security Misconfiguration**: Follow secure deployment best practices
+- **Using Components with Known Vulnerabilities**: Regularly update dependencies
+
+### Security Testing
+- Run security scanning as part of CI/CD pipeline
+- Conduct regular code reviews with security focus
+- Consider adding security-focused tests for high-risk functionality
