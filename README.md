@@ -42,7 +42,7 @@ npm install
 3. Configure the environment variables (optional)
 
 ```
-PORT - Server port (default: 3000)
+PORT - Server port (default: 3001)
 DB_PATH - Path to SQLite database (default: './memedb/memes.sqlite3')
 MEME_DIR - Directory for storing meme files (default: './memedb/memes')
 OLLAMA_HOST - Ollama API host (default: 'http://localhost:11434')
@@ -67,7 +67,7 @@ npm run import /path/to/meme/folder
 npm run serve
 ```
 
-7. Open http://localhost:3000 in your browser
+7. Open http://localhost:3001 in your browser
 
 ## Project Structure
 

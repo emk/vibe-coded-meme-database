@@ -83,7 +83,7 @@ memedb/
 - `GET /images/:category/:filename` - Serve meme image files
 
 ## Environment Variables
-- `PORT` - Server port (default: 3000)
+- `PORT` - Server port (default: 3001)
 - `DB_PATH` - Path to SQLite database (default: './memedb/memes.sqlite3')
 - `MEME_DIR` - Directory for storing meme files (default: './memedb/memes')
 - `OLLAMA_HOST` - Ollama API host (default: 'http://localhost:11434')
