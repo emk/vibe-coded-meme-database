@@ -13,6 +13,7 @@ The original working version of this program was written by [Claude Code](https:
 Other human-written bits added to make this more useful:
 
 - Improved LLM prompt using "structured output" mode and JSON schema. This fixed OCR text extraction with gemma3:27b, which is still somewhat picky.
+- Semantic search didn't include any human written code. But it was still a true collaborative effort between AI and human to actually figure out how to make it work. Neither the AI nor the human would have made it on their own this time, largely thanks to massive breakage in many parts of the ecosystem.
 
 ## Features
 
