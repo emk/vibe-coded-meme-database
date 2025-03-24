@@ -1,7 +1,11 @@
-// Jest setup file
+// Vitest setup file
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
+import { afterAll, vi } from 'vitest';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Set test environment variables
 process.env.NODE_ENV = 'test';
@@ -20,8 +24,8 @@ export function getTempMemeDir() {
   return memeDir;
 }
 
-// Increase Jest timeout for database operations
-jest.setTimeout(10000);
+// Increase Vitest timeout for database operations
+vi.setConfig({ testTimeout: 10000 });
 
 // Global teardown
 afterAll(() => {

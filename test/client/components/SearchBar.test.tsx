@@ -1,37 +1,38 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { render, fireEvent } from '@testing-library/react';
+import { vi, describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { SearchBar } from '../../../src/client/src/components/SearchBar';
 
 describe('SearchBar Component', () => {
   // Mock search handler function
-  const mockOnSearch = jest.fn();
+  const mockOnSearch = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
   
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   test('renders search input and buttons', () => {
-    render(<SearchBar onSearch={mockOnSearch} />);
+    const { container } = render(<SearchBar onSearch={mockOnSearch} />);
     
     // Check that input and buttons exist
-    const input = screen.getByPlaceholderText('Search memes...');
-    const searchButton = screen.getByText('Search');
-    const helpButton = screen.getByRole('button', { name: /search syntax help/i });
+    const input = container.querySelector('input[placeholder="Search memes..."]');
+    const searchButton = container.querySelector('button:not([aria-label])');
+    const helpButton = container.querySelector('button[aria-label="Search syntax help"]');
     
-    expect(input).toBeInTheDocument();
-    expect(searchButton).toBeInTheDocument();
-    expect(helpButton).toBeInTheDocument();
+    expect(input).not.toBeNull();
+    expect(searchButton).not.toBeNull();
+    expect(helpButton).not.toBeNull();
+    expect(searchButton).toHaveTextContent('Search');
   });
 
   test('updates input value when typing', () => {
-    render(<SearchBar onSearch={mockOnSearch} />);
+    const { container } = render(<SearchBar onSearch={mockOnSearch} />);
     
-    const input = screen.getByPlaceholderText('Search memes...') as HTMLInputElement;
+    const input = container.querySelector('input[placeholder="Search memes..."]') as HTMLInputElement;
     
     // Simulate typing in the input
     fireEvent.change(input, { target: { value: 'test query' } });
@@ -41,10 +42,10 @@ describe('SearchBar Component', () => {
   });
 
   test('calls onSearch when button is clicked', () => {
-    render(<SearchBar onSearch={mockOnSearch} />);
+    const { container } = render(<SearchBar onSearch={mockOnSearch} />);
     
-    const input = screen.getByPlaceholderText('Search memes...');
-    const button = screen.getByText('Search');
+    const input = container.querySelector('input[placeholder="Search memes..."]') as HTMLInputElement;
+    const button = container.querySelector('button.searchButton') || container.querySelector('button:not([aria-label])');
     
     // Type something and click search
     fireEvent.change(input, { target: { value: 'test query' } });
@@ -55,9 +56,9 @@ describe('SearchBar Component', () => {
   });
 
   test('calls onSearch when Enter key is pressed', () => {
-    render(<SearchBar onSearch={mockOnSearch} />);
+    const { container } = render(<SearchBar onSearch={mockOnSearch} />);
     
-    const input = screen.getByPlaceholderText('Search memes...');
+    const input = container.querySelector('input[placeholder="Search memes..."]');
     
     // Type something and press Enter
     fireEvent.change(input, { target: { value: 'keyboard query' } });
@@ -68,9 +69,9 @@ describe('SearchBar Component', () => {
   });
 
   test('does not call onSearch when other keys are pressed', () => {
-    render(<SearchBar onSearch={mockOnSearch} />);
+    const { container } = render(<SearchBar onSearch={mockOnSearch} />);
     
-    const input = screen.getByPlaceholderText('Search memes...');
+    const input = container.querySelector('input[placeholder="Search memes..."]');
     
     // Type something and press a key other than Enter
     fireEvent.change(input, { target: { value: 'test query' } });
@@ -81,31 +82,36 @@ describe('SearchBar Component', () => {
   });
 
   test('displays error message when provided', () => {
-    render(<SearchBar onSearch={mockOnSearch} error="Test error message" />);
+    const { container } = render(<SearchBar onSearch={mockOnSearch} error="Test error message" />);
     
     // Check that the error message is displayed
-    const errorElement = screen.getByText('Test error message');
-    expect(errorElement).toBeInTheDocument();
+    const errorElement = container.querySelector('div[class*="errorMessage"]');
+    expect(errorElement).not.toBeNull();
+    expect(errorElement.textContent).toBe('Test error message');
   });
 
   // Test that the help button shows/hides help
   test('toggles help panel when help button is clicked', () => {
-    render(<SearchBar onSearch={mockOnSearch} />);
+    const { container } = render(<SearchBar onSearch={mockOnSearch} />);
     
     // Initially help panel should not be visible
-    expect(screen.queryByRole('heading', { name: 'Search Syntax' })).not.toBeInTheDocument();
+    const initialHelpPanel = container.querySelector('h4');
+    expect(initialHelpPanel).toBeNull();
     
     // Click help button
-    const helpButton = screen.getByRole('button', { name: /search syntax help/i });
+    const helpButton = container.querySelector('button[aria-label="Search syntax help"]');
     fireEvent.click(helpButton);
     
     // Now help panel should be visible
-    expect(screen.getByRole('heading', { name: 'Search Syntax' })).toBeInTheDocument();
+    const helpPanelAfterClick = container.querySelector('h4');
+    expect(helpPanelAfterClick).not.toBeNull();
+    expect(helpPanelAfterClick.textContent).toBe('Search Syntax');
     
     // Click help button again to hide panel
     fireEvent.click(helpButton);
     
     // Help panel should be hidden again
-    expect(screen.queryByRole('heading', { name: 'Search Syntax' })).not.toBeInTheDocument();
+    const helpPanelAfterSecondClick = container.querySelector('h4');
+    expect(helpPanelAfterSecondClick).toBeNull();
   });
 });

@@ -1,17 +1,17 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { vi, describe, test, expect } from 'vitest';
 import { MemeGrid } from '../../../src/client/src/components/MemeGrid';
 import { SelectionContext } from '../../../src/client/src/hooks/useSelection';
 
 // Mock selection context for rendering
 const mockSelectionContext = {
   selectedMemes: new Set<number>(),
-  toggleMeme: jest.fn(),
-  isSelected: jest.fn(),
-  clearSelection: jest.fn(),
+  toggleMeme: vi.fn(),
+  isSelected: vi.fn(),
+  clearSelection: vi.fn(),
   selectionCount: 0,
-  getSelectedIds: jest.fn().mockReturnValue([])
+  getSelectedIds: vi.fn().mockReturnValue([])
 };
 
 // Sample meme data
@@ -41,7 +41,7 @@ const mockMemes = [
 ];
 
 // Mock MemeCard to isolate MemeGrid tests
-jest.mock('../../../src/client/src/components/MemeCard', () => ({
+vi.mock('../../../src/client/src/components/MemeCard', () => ({
   MemeCard: ({ meme }) => <div data-testid={`meme-card-${meme.id}`}>{meme.filename}</div>
 }));
 

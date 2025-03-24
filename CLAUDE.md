@@ -111,13 +111,16 @@ npm run test:server
 npm run test:client
 
 # Run a specific test file
-npm test -- path/to/test.test.ts
+npm run test:server -- path/to/test.test.ts
+npm run test:client -- path/to/test.test.tsx
 
 # Run tests with a specific name pattern
-npm test -- -t "pattern"
+npm run test:server -- -t "pattern"
+npm run test:client -- -t "pattern"
 
-# Run tests with coverage report
-npm test -- --coverage
+# Run tests in watch mode
+npm run test:server -- --watch
+npm run test:client -- --watch
 ```
 
 ### Testing Philosophy

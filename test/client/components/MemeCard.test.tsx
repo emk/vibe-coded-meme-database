@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { vi, describe, test, expect, beforeEach } from 'vitest';
 import { MemeCard } from '../../../src/client/src/components/MemeCard';
 import { SelectionContext } from '../../../src/client/src/hooks/useSelection';
 
@@ -20,17 +20,17 @@ const mockMeme = {
 // Mock selection context
 const mockSelectionContext = {
   selectedMemes: new Set<number>(),
-  toggleMeme: jest.fn(),
-  isSelected: jest.fn().mockReturnValue(false),
-  clearSelection: jest.fn(),
+  toggleMeme: vi.fn(),
+  isSelected: vi.fn().mockReturnValue(false),
+  clearSelection: vi.fn(),
   selectionCount: 0,
-  getSelectedIds: jest.fn().mockReturnValue([])
+  getSelectedIds: vi.fn().mockReturnValue([])
 };
 
 describe('MemeCard Component', () => {
   // Reset mocks before each test
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders meme card with image and keywords', () => {
@@ -72,7 +72,7 @@ describe('MemeCard Component', () => {
     // Mock the selection context to show this meme as selected
     const selectedContext = {
       ...mockSelectionContext,
-      isSelected: jest.fn().mockReturnValue(true)
+      isSelected: vi.fn().mockReturnValue(true)
     };
     
     render(

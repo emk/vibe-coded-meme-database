@@ -1,13 +1,17 @@
 // Client test setup
-import '@testing-library/jest-dom';
+import { beforeEach, vi, expect } from 'vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
+
+// Extend Vitest's expect with jest-dom matchers
+expect.extend(matchers);
 
 // Set up browser globals 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Reset mocks before each test
 beforeEach(() => {
-  jest.resetAllMocks();
+  vi.resetAllMocks();
 });
 
-// Increase Jest timeout for React tests
-jest.setTimeout(5000);
+// Increase Vitest timeout for React tests
+vi.setConfig({ testTimeout: 5000 });

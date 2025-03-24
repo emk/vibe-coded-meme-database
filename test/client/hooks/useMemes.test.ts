@@ -1,12 +1,13 @@
 import { renderHook, act } from '@testing-library/react';
 import { useMemes } from '../../../src/client/src/hooks/useMemes';
+import { vi, describe, test, expect, beforeEach } from 'vitest';
 
 // Mock fetch to avoid actual API calls
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('useMemes Hook', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   test('should initialize with loading state and fetch memes', async () => {
@@ -25,7 +26,7 @@ describe('useMemes Hook', () => {
       }
     ];
     
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => mockMemes
     });
@@ -53,7 +54,7 @@ describe('useMemes Hook', () => {
 
   test('should handle API errors', async () => {
     // Mock API error with error response
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: false,
       status: 500,
       json: async () => ({ error: 'Failed to fetch memes' })
@@ -89,7 +90,7 @@ describe('useMemes Hook', () => {
     ];
     
     // Initial fetch
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => []
     });
@@ -102,7 +103,7 @@ describe('useMemes Hook', () => {
     });
     
     // Mock second fetch for search
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => mockSearchResults
     });
@@ -123,7 +124,7 @@ describe('useMemes Hook', () => {
 
   test('should handle network errors', async () => {
     // Mock network error
-    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+    (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
     
     const { result } = renderHook(() => useMemes());
     

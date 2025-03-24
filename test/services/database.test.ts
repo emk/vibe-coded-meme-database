@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import { describe, test, expect, beforeAll, afterAll } from 'vitest';
 import { DatabaseService } from '../../src/services/database';
 import { MemeInput } from '../../src/models/Meme';
 import { getTempDbPath } from '../setup';

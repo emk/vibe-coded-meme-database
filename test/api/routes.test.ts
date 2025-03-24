@@ -2,6 +2,7 @@ import express from 'express';
 import request from 'supertest';
 import path from 'path';
 import fs from 'fs';
+import { describe, test, expect, beforeAll, afterAll } from 'vitest';
 import { DatabaseService } from '../../src/services/database';
 import { getTempDbPath, getTempMemeDir } from '../setup';
 

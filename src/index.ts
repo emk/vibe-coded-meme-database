@@ -4,7 +4,12 @@ import cors from 'cors';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import archiver from 'archiver';
+import { fileURLToPath } from 'url';
 import { DatabaseService } from './services/database';
+
+// In ESM, __dirname is not defined, so we need to create it
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();

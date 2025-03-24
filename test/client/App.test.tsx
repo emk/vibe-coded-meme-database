@@ -1,28 +1,28 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { vi, describe, test, expect, beforeEach } from 'vitest';
 import App from '../../src/client/src/App';
 import { useMemes } from '../../src/client/src/hooks/useMemes';
 import { useSelection } from '../../src/client/src/hooks/useSelection';
 
 // Mock the hooks
-jest.mock('../../src/client/src/hooks/useMemes');
-jest.mock('../../src/client/src/hooks/useSelection');
+vi.mock('../../src/client/src/hooks/useMemes');
+vi.mock('../../src/client/src/hooks/useSelection');
 // Mock the child components to simplify testing
-jest.mock('../../src/client/src/components/SearchBar', () => ({
+vi.mock('../../src/client/src/components/SearchBar', () => ({
   SearchBar: ({ onSearch, error }) => (
     <div data-testid="mock-search-bar">
       <input 
         data-testid="search-input" 
         onChange={() => {}}
-        onKeyUp={jest.fn()}
+        onKeyUp={vi.fn()}
       />
       <button data-testid="search-button" onClick={() => onSearch('test query')}>Search</button>
       {error && <span>Error: {error}</span>}
     </div>
   )
 }));
-jest.mock('../../src/client/src/components/MemeGrid', () => ({
+vi.mock('../../src/client/src/components/MemeGrid', () => ({
   MemeGrid: ({ memes, loading }) => (
     <div data-testid="mock-meme-grid">
       {loading && <span>Loading...</span>}
@@ -30,7 +30,7 @@ jest.mock('../../src/client/src/components/MemeGrid', () => ({
     </div>
   )
 }));
-jest.mock('../../src/client/src/components/SelectionFooter', () => ({
+vi.mock('../../src/client/src/components/SelectionFooter', () => ({
   SelectionFooter: () => <div data-testid="mock-selection-footer">Selection Footer</div>
 }));
 
@@ -51,21 +51,21 @@ describe('App Component', () => {
   ];
   
   // Mock hook implementations
-  const mockFetchMemes = jest.fn();
+  const mockFetchMemes = vi.fn();
   const mockSelectionState = {
     selectedMemes: new Set<number>(),
-    toggleMeme: jest.fn(),
-    isSelected: jest.fn(),
-    clearSelection: jest.fn(),
+    toggleMeme: vi.fn(),
+    isSelected: vi.fn(),
+    clearSelection: vi.fn(),
     selectionCount: 0,
-    getSelectedIds: jest.fn()
+    getSelectedIds: vi.fn()
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     
     // Setup mock for useMemes hook
-    (useMemes as jest.Mock).mockReturnValue({
+    (useMemes as any).mockReturnValue({
       memes: mockMemes,
       loading: false,
       error: null,
@@ -73,7 +73,7 @@ describe('App Component', () => {
     });
     
     // Setup mock for useSelection hook
-    (useSelection as jest.Mock).mockReturnValue(mockSelectionState);
+    (useSelection as any).mockReturnValue(mockSelectionState);
   });
 
   test('renders the App with all components', () => {
@@ -87,17 +87,19 @@ describe('App Component', () => {
   });
 
   test('passes the correct props to child components', () => {
-    render(<App />);
+    const { container } = render(<App />);
     
     // Check that MemeGrid receives the correct props
-    expect(screen.getByText('Meme count: 1')).toBeInTheDocument();
+    const memeCountElement = container.querySelector('[data-testid="mock-meme-grid"] span');
+    expect(memeCountElement).toHaveTextContent('Meme count: 1');
   });
 
   test('calls fetchMemes when search is performed', () => {
-    render(<App />);
+    const { container } = render(<App />);
     
-    // Simulate search
-    fireEvent.click(screen.getByTestId('search-button'));
+    // Simulate search - get the first search button
+    const searchButton = container.querySelector('[data-testid="search-button"]');
+    fireEvent.click(searchButton);
     
     // Check that fetchMemes was called with the search query
     expect(mockFetchMemes).toHaveBeenCalledWith('test query');
@@ -105,7 +107,7 @@ describe('App Component', () => {
 
   test('handles loading state', () => {
     // Mock loading state
-    (useMemes as jest.Mock).mockReturnValue({
+    (useMemes as any).mockReturnValue({
       memes: [],
       loading: true,
       error: null,
@@ -119,7 +121,7 @@ describe('App Component', () => {
 
   test('handles error state', () => {
     // Mock error state
-    (useMemes as jest.Mock).mockReturnValue({
+    (useMemes as any).mockReturnValue({
       memes: [],
       loading: false,
       error: 'API error',

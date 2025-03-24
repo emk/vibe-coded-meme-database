@@ -1,8 +1,11 @@
 import { FileMigrationProvider, Kysely, Migrator, SqliteDialect } from 'kysely';
 import Database from 'better-sqlite3';
-import * as path from 'path';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { promises as fs } from 'fs';
 import { Database as DbType } from '../models/Meme';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function createMigrator(dbPath: string): Promise<{
   db: Kysely<DbType>;
