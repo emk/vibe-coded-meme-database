@@ -45,7 +45,7 @@
 
 - Create a separate test database for each test suite
 - Provide utility functions for test database setup/teardown
-- Use Jest's setup/teardown hooks for proper cleanup
+- Use Vitest's setup/teardown hooks for proper cleanup
 
 ## Test Data
 
