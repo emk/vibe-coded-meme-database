@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { promises as fs } from 'fs';
 import { Database as DbType } from '../models/Meme';
+import { load as loadVecExtension } from 'sqlite-vec';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -19,9 +20,21 @@ export async function createMigrator(dbPath: string): Promise<{
     // Directory already exists
   }
 
+  // Initialize better-sqlite3 database directly
+  const sqliteDb = new Database(dbPath);
+  
+  // Load the vector extension before creating Kysely instance
+  try {
+    loadVecExtension(sqliteDb);
+    console.log('Vector search extension loaded for migrations');
+  } catch (err) {
+    console.warn('Failed to load vector search extension for migrations:', err);
+  }
+
+  // Create Kysely instance with the SQLite connection
   const db = new Kysely<DbType>({
     dialect: new SqliteDialect({
-      database: new Database(dbPath)
+      database: sqliteDb
     }),
   });
 

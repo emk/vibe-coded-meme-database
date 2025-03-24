@@ -138,7 +138,71 @@ describe('DatabaseService', () => {
     expect(foundHashesSet.has('search-hash-2')).toBe(true);
   });
 
-  // Test advanced search features
+  // Test semantic search functionality
+  describe('Semantic search capabilities', () => {
+    beforeAll(async () => {
+      // Add a variety of memes for semantic search testing
+      await dbService.addMeme({
+        ...sampleMeme,
+        hash: 'semantic-test-1',
+        text: 'Surprised Pikachu face meme',
+        description: 'A yellow Pokemon looking shocked',
+        keywords: ['surprised', 'pikachu', 'pokemon', 'reaction']
+      });
+
+      await dbService.addMeme({
+        ...sampleMeme,
+        hash: 'semantic-test-2',
+        text: 'Distracted boyfriend meme',
+        description: 'Guy looking at another woman while with girlfriend',
+        keywords: ['distracted', 'boyfriend', 'jealous', 'reaction']
+      });
+
+      await dbService.addMeme({
+        ...sampleMeme,
+        hash: 'semantic-test-3',
+        text: 'Detective Pikachu movie poster',
+        description: 'Promotional image from the Pokemon movie',
+        keywords: ['pikachu', 'detective', 'movie', 'pokemon']
+      });
+    });
+
+    // Test basic semantic search
+    test('semanticSearch should find similar memes based on content', async () => {
+      // Perform semantic search for Pokemon-related content
+      const results = await dbService.semanticSearch('Pokemon character looks shocked');
+      
+      // Verify we have results
+      expect(results.length).toBeGreaterThan(0);
+      
+      // Results should have the expected structure
+      expect(results[0]).toHaveProperty('id');
+      expect(results[0]).toHaveProperty('distance');
+      expect(results[0]).toHaveProperty('similarity');
+      expect(results[0]).toHaveProperty('meme');
+      
+      // Similarity score should be between 0 and 1
+      expect(results[0].similarity).toBeGreaterThanOrEqual(0);
+      expect(results[0].similarity).toBeLessThanOrEqual(1);
+    });
+
+    // Test empty query handling
+    test('semanticSearch should return empty array for empty query', async () => {
+      const results = await dbService.semanticSearch('');
+      expect(Array.isArray(results)).toBe(true);
+      expect(results.length).toBe(0);
+    });
+
+    // Test limit parameter
+    test('semanticSearch should respect the limit parameter', async () => {
+      const limit = 2;
+      const results = await dbService.semanticSearch('Pokemon', limit);
+      
+      expect(results.length).toBeLessThanOrEqual(limit);
+    });
+  });
+
+  // Test FTS5 search capabilities
   describe('FTS5 search capabilities', () => {
     beforeAll(async () => {
       // Add a variety of memes for testing different search features

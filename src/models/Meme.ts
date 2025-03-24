@@ -3,6 +3,11 @@ import { Generated, Insertable, Selectable, Updateable } from 'kysely';
 // Database schema types for Kysely
 export interface Database {
   memes: MemeTable;
+  meme_embeddings: {
+    rowid: number;  // Maps to memes.id
+    embedding: any; // Will be queried using MATCH operator
+    distance: number; // For search results
+  };
   memes_fts: {
     rowid: number;
     text: string | null;
@@ -66,4 +71,12 @@ export interface MemeInput {
   text: string;
   description: string;
   keywords: string[];
+}
+
+// Interface for semantic search results
+export interface SimilaritySearchResult {
+  id: number;
+  distance: number; // Raw distance from vector search
+  similarity: number; // Normalized similarity score (0-1)
+  meme: Meme;
 }
