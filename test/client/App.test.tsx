@@ -65,7 +65,7 @@ describe('App Component', () => {
     vi.clearAllMocks();
     
     // Setup mock for useMemes hook
-    (useMemes as any).mockReturnValue({
+    vi.mocked(useMemes).mockReturnValue({
       memes: mockMemes,
       loading: false,
       error: null,
@@ -73,7 +73,7 @@ describe('App Component', () => {
     });
     
     // Setup mock for useSelection hook
-    (useSelection as any).mockReturnValue(mockSelectionState);
+    vi.mocked(useSelection).mockReturnValue(mockSelectionState);
   });
 
   test('renders the App with all components', () => {
@@ -107,7 +107,7 @@ describe('App Component', () => {
 
   test('handles loading state', () => {
     // Mock loading state
-    (useMemes as any).mockReturnValue({
+    vi.mocked(useMemes).mockReturnValue({
       memes: [],
       loading: true,
       error: null,
@@ -121,7 +121,7 @@ describe('App Component', () => {
 
   test('handles error state', () => {
     // Mock error state
-    (useMemes as any).mockReturnValue({
+    vi.mocked(useMemes).mockReturnValue({
       memes: [],
       loading: false,
       error: 'API error',

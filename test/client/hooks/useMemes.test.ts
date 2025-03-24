@@ -3,7 +3,7 @@ import { useMemes } from '../../../src/client/src/hooks/useMemes';
 import { vi, describe, test, expect, beforeEach } from 'vitest';
 
 // Mock fetch to avoid actual API calls
-global.fetch = vi.fn();
+const fetchSpy = vi.spyOn(global, 'fetch').mockImplementation(vi.fn());
 
 describe('useMemes Hook', () => {
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe('useMemes Hook', () => {
       }
     ];
     
-    (global.fetch as any).mockResolvedValueOnce({
+    fetchSpy.mockResolvedValueOnce({
       ok: true,
       json: async () => mockMemes
     });
@@ -54,7 +54,7 @@ describe('useMemes Hook', () => {
 
   test('should handle API errors', async () => {
     // Mock API error with error response
-    (global.fetch as any).mockResolvedValueOnce({
+    fetchSpy.mockResolvedValueOnce({
       ok: false,
       status: 500,
       json: async () => ({ error: 'Failed to fetch memes' })
@@ -90,7 +90,7 @@ describe('useMemes Hook', () => {
     ];
     
     // Initial fetch
-    (global.fetch as any).mockResolvedValueOnce({
+    fetchSpy.mockResolvedValueOnce({
       ok: true,
       json: async () => []
     });
@@ -103,7 +103,7 @@ describe('useMemes Hook', () => {
     });
     
     // Mock second fetch for search
-    (global.fetch as any).mockResolvedValueOnce({
+    fetchSpy.mockResolvedValueOnce({
       ok: true,
       json: async () => mockSearchResults
     });
@@ -124,7 +124,7 @@ describe('useMemes Hook', () => {
 
   test('should handle network errors', async () => {
     // Mock network error
-    (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+    fetchSpy.mockRejectedValueOnce(new Error('Network error'));
     
     const { result } = renderHook(() => useMemes());
     
